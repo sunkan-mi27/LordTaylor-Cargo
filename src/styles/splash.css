@@ -1,0 +1,170 @@
+/* ===========================
+   SPLASH SCREEN
+=========================== */
+
+.splash-page {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    radial-gradient(circle at top, rgba(212, 175, 55, 0.12), transparent 45%),
+    radial-gradient(
+      circle at bottom right,
+      rgba(44, 255, 181, 0.08),
+      transparent 40%
+    ),
+    #050816;
+}
+
+.splash-page::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+
+  background-size: 70px 70px;
+
+  opacity: 0.35;
+
+  pointer-events: none;
+}
+
+.splash-content {
+  position: relative;
+  z-index: 2;
+
+  width: min(90%, 520px);
+
+  text-align: center;
+}
+
+.splash-logo {
+  width: 110px;
+  height: 110px;
+
+  margin: 0 auto 32px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #d4af37, #f7d36a);
+
+  color: #fff;
+
+  font-size: 48px;
+
+  box-shadow:
+    0 0 25px rgba(212, 175, 55, 0.35),
+    0 0 80px rgba(212, 175, 55, 0.15);
+}
+
+.splash-title {
+  color: #fff;
+
+  font-size: clamp(2.5rem, 6vw, 4rem);
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+}
+
+.splash-subtitle {
+  margin-top: 12px;
+
+  color: #d4af37;
+
+  font-size: 1.15rem;
+
+  font-weight: 600;
+}
+
+.splash-text {
+  margin-top: 18px;
+
+  color: #9aa8bf;
+
+  font-size: 0.98rem;
+
+  line-height: 1.8;
+}
+
+.loading-wrapper {
+  width: 100%;
+
+  height: 8px;
+
+  margin-top: 45px;
+
+  border-radius: 100px;
+
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.loading-bar {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: linear-gradient(90deg, #d4af37, #f7d36a, #ffffff);
+
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.5);
+}
+
+.loading-text {
+  display: inline-block;
+
+  margin-top: 18px;
+
+  color: #c7d2e3;
+
+  font-size: 0.92rem;
+
+  letter-spacing: 0.5px;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 768px) {
+  .splash-logo {
+    width: 90px;
+    height: 90px;
+    font-size: 38px;
+  }
+
+  .splash-subtitle {
+    font-size: 1rem;
+  }
+
+  .splash-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 480px) {
+  .splash-content {
+    width: 92%;
+  }
+
+  .loading-wrapper {
+    margin-top: 34px;
+  }
+}

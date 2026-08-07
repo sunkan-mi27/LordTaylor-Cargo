@@ -1,0 +1,548 @@
+/* ==========================================
+   GLOBAL
+========================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* ==========================================
+   NAVBAR
+========================================== */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 22px 70px;
+
+  background: transparent;
+
+  border: none;
+
+  box-sizing: border-box;
+
+  z-index: 1000;
+}
+
+/* ==========================================
+   LOGO
+========================================== */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  cursor: pointer;
+
+  user-select: none;
+}
+
+.logo-icon {
+  width: 56px;
+  height: 56px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(135deg, #d4af37, #f7d36a);
+
+  color: #fff;
+
+  font-size: 24px;
+
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.25);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-name {
+  color: #fff;
+
+  font-size: 1.55rem;
+
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+.company-tagline {
+  margin-top: 6px;
+
+  color: #94a3b8;
+
+  font-size: 0.9rem;
+
+  font-weight: 500;
+}
+
+/* ==========================================
+   RIGHT SIDE
+========================================== */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+/* ==========================================
+   DESKTOP NAVIGATION
+========================================== */
+
+.nav-links {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 42px;
+}
+
+.nav-links a {
+  position: relative;
+
+  color: #d8e2ef;
+
+  text-decoration: none;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #fff;
+}
+
+.nav-links a::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  bottom: -8px;
+
+  width: 0;
+
+  height: 2px;
+
+  border-radius: 20px;
+
+  background: #d4af37;
+
+  transition: 0.35s ease;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* ==========================================
+   CONTACT BUTTON
+========================================== */
+
+.demo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 13px 24px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #d4af37, #f7d36a);
+
+  color: #08111f;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.35s ease;
+
+  white-space: nowrap;
+}
+
+.demo-btn:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 14px 30px rgba(212, 175, 55, 0.3);
+}
+
+/* ==========================================
+   HAMBURGER
+========================================== */
+
+.menu-btn {
+  display: none;
+
+  width: 48px;
+  height: 48px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #fff;
+
+  font-size: 22px;
+
+  cursor: pointer;
+
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.3s ease;
+}
+
+.menu-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ==========================================
+   MOBILE OVERLAY
+========================================== */
+
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  backdrop-filter: blur(6px);
+
+  z-index: 1100;
+}
+
+/* ==========================================
+   MOBILE DRAWER
+========================================== */
+
+.mobile-menu {
+  position: fixed;
+
+  top: 0;
+  right: 0;
+
+  width: 340px;
+  max-width: 90vw;
+
+  height: 100vh;
+
+  padding: 28px;
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  background: rgba(8, 15, 28, 0.96);
+
+  backdrop-filter: blur(28px);
+
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow: -25px 0 60px rgba(0, 0, 0, 0.45);
+
+  z-index: 1200;
+}
+/* ==========================================
+   CLOSE BUTTON
+========================================== */
+
+.close-btn {
+  width: 46px;
+  height: 46px;
+
+  margin-left: auto;
+  margin-bottom: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #fff;
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+.close-btn:hover {
+  background: rgba(212, 175, 55, 0.18);
+  transform: rotate(90deg);
+}
+
+/* ==========================================
+   MOBILE LOGO
+========================================== */
+
+.mobile-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: 0;
+  padding-left: 0;
+
+  margin-bottom: 40px;
+}
+
+/* ==========================================
+   MOBILE LINKS
+========================================== */
+
+.mobile-links {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.mobile-links a {
+  display: flex;
+  align-items: center;
+
+  padding: 18px 0;
+
+  border-radius: 16px;
+
+  color: #e5edf8;
+
+  text-decoration: none;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+.mobile-links a:hover {
+  background: rgba(212, 175, 55, 0.12);
+
+  color: #fff;
+
+  transform: translateX(8px);
+}
+
+/* ===========================
+   LOGOUT BUTTON
+=========================== */
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-left: 16px;
+
+  padding: 14px 20px;
+
+  border-radius: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.06);
+
+  color: #fff;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.35s ease;
+}
+
+.logout-btn:hover {
+  background: #ef4444;
+
+  border-color: #ef4444;
+
+  color: #fff;
+
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.35);
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 980px) {
+  .navbar {
+    padding: 16px 18px;
+  }
+
+  .logo {
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  .company-name {
+    font-size: 1.15rem;
+  }
+
+  .company-tagline {
+    display: none;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .demo-btn {
+    display: none;
+  }
+
+  .menu-btn {
+    display: flex;
+  }
+}
+
+@media (min-width: 981px) {
+  .menu-btn,
+  .mobile-menu,
+  .mobile-overlay {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 14px;
+  }
+
+  .logo-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+  }
+
+  .company-name {
+    font-size: 1rem;
+  }
+
+  .mobile-menu {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px;
+  }
+
+  .mobile-links a {
+    padding: 16px;
+    font-size: 15px;
+  }
+}
+.login-link {
+  color: #ffffff;
+
+  text-decoration: none;
+
+  font-size: 0.95rem;
+
+  font-weight: 600;
+
+  transition: 0.3s ease;
+
+  margin-right: 18px;
+}
+
+.login-link:hover {
+  color: #22c55e;
+}
+
+.mobile-login-btn {
+  width: 100%;
+
+  text-align: center;
+
+  padding: 15px;
+
+  margin-top: 25px;
+
+  border-radius: 14px;
+
+  text-decoration: none;
+
+  color: #ffffff;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  transition: 0.3s;
+}
+
+.mobile-login-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mobile-register-btn {
+  width: 100%;
+
+  text-align: center;
+
+  padding: 15px;
+
+  margin-top: 15px;
+
+  border-radius: 14px;
+
+  text-decoration: none;
+
+  color: #ffffff;
+
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.mobile-register-btn:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+}

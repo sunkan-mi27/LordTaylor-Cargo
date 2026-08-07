@@ -1,0 +1,581 @@
+/*==========================================
+  QUOTE DOCUMENT
+==========================================*/
+
+.quote-document {
+  position: sticky;
+
+  top: 120px;
+
+  padding: 40px;
+
+  border-radius: 30px;
+
+  background: #ffffff;
+
+  color: #111827;
+
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.35);
+
+  overflow: hidden;
+}
+
+.quote-document::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 6px;
+
+  background: linear-gradient(90deg, #22c55e, #0ea5e9, #2563eb);
+}
+
+/*==========================================
+  HEADER
+==========================================*/
+
+.document-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 30px;
+
+  padding-bottom: 30px;
+
+  margin-bottom: 30px;
+
+  border-bottom: 2px dashed #e5e7eb;
+}
+
+.company-tag {
+  display: inline-block;
+
+  padding: 8px 18px;
+
+  border-radius: 999px;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.5px;
+
+  margin-bottom: 14px;
+}
+
+.document-top h2 {
+  font-size: 2rem;
+
+  font-weight: 800;
+
+  color: #111827;
+}
+
+.quote-meta {
+  text-align: right;
+}
+
+.quote-meta p {
+  display: flex;
+
+  flex-direction: column;
+
+  margin-bottom: 16px;
+}
+
+.quote-meta strong {
+  font-size: 13px;
+
+  color: #6b7280;
+
+  margin-bottom: 4px;
+}
+
+.quote-meta span {
+  font-size: 16px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+/*==========================================
+  DOCUMENT SECTION
+==========================================*/
+
+.document-section {
+  margin-bottom: 35px;
+}
+
+.document-section h3 {
+  font-size: 20px;
+
+  font-weight: 800;
+
+  margin-bottom: 24px;
+
+  color: #111827;
+
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.document-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 22px;
+}
+
+.document-grid label {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #6b7280;
+
+  margin-bottom: 8px;
+}
+
+.document-grid svg {
+  color: #0ea5e9;
+}
+
+.document-grid p {
+  font-size: 16px;
+
+  font-weight: 600;
+
+  color: #111827;
+
+  line-height: 1.6;
+}
+/*==========================================
+  PRICE BREAKDOWN
+==========================================*/
+
+.price-breakdown {
+  padding: 28px;
+
+  border-radius: 22px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+}
+
+.price-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 18px 0;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.price-row:last-child {
+  border-bottom: none;
+}
+
+.price-row span {
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #64748b;
+}
+
+.price-row strong {
+  font-size: 17px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.price-row.total {
+  margin-top: 12px;
+
+  padding: 24px;
+
+  border: none;
+
+  border-radius: 18px;
+
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+
+  box-shadow: 0 20px 45px rgba(37, 99, 235, 0.25);
+}
+
+.price-row.total span {
+  color: #fff;
+
+  font-size: 18px;
+
+  font-weight: 700;
+}
+
+.price-row.total strong {
+  font-size: 32px;
+
+  font-weight: 800;
+
+  color: #fff;
+}
+
+/*==========================================
+  DOCUMENT FOOTER
+==========================================*/
+
+.document-footer {
+  margin-top: 40px;
+
+  padding-top: 35px;
+
+  border-top: 2px dashed #e5e7eb;
+}
+
+/*==========================================
+  NOTICE
+==========================================*/
+
+.document-note {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 18px;
+
+  padding: 22px;
+
+  margin-bottom: 30px;
+
+  border-radius: 18px;
+
+  background: #fff7ed;
+
+  border: 1px solid #fed7aa;
+}
+
+.document-note svg {
+  font-size: 22px;
+
+  color: #ea580c;
+
+  margin-top: 3px;
+}
+
+.document-note h4 {
+  font-size: 17px;
+
+  font-weight: 700;
+
+  color: #9a3412;
+
+  margin-bottom: 8px;
+}
+
+.document-note p {
+  font-size: 15px;
+
+  line-height: 1.8;
+
+  color: #7c2d12;
+}
+
+/*==========================================
+  ACTION BUTTONS
+==========================================*/
+
+.document-actions {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 16px;
+
+  margin-bottom: 35px;
+}
+
+.document-actions button {
+  height: 58px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  transition: 0.35s ease;
+}
+
+.download-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+
+  color: #fff;
+
+  box-shadow: 0 18px 35px rgba(34, 197, 94, 0.25);
+}
+
+.print-btn {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+
+  color: #fff;
+
+  box-shadow: 0 18px 35px rgba(37, 99, 235, 0.25);
+}
+
+.email-btn {
+  background: #111827;
+
+  color: #fff;
+
+  box-shadow: 0 18px 35px rgba(17, 24, 39, 0.25);
+}
+
+.document-actions button:hover {
+  transform: translateY(-5px);
+}
+/*==========================================
+  COMPANY SIGNATURE
+==========================================*/
+
+.signature {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding-top: 30px;
+
+  margin-top: 30px;
+
+  border-top: 1px solid #e5e7eb;
+
+  gap: 30px;
+}
+
+.signature h4 {
+  font-size: 22px;
+
+  font-weight: 800;
+
+  color: #111827;
+
+  margin-bottom: 8px;
+}
+
+.signature p {
+  font-size: 15px;
+
+  color: #64748b;
+
+  line-height: 1.7;
+}
+
+.signature span {
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #2563eb;
+
+  font-style: italic;
+}
+
+/*==========================================
+  DOCUMENT WATERMARK
+==========================================*/
+
+.quote-document::after {
+  content: "GLOBAL EXPRESS";
+
+  position: absolute;
+
+  top: 50%;
+
+  left: 50%;
+
+  transform: translate(-50%, -50%) rotate(-28deg);
+
+  font-size: 90px;
+
+  font-weight: 900;
+
+  letter-spacing: 8px;
+
+  color: rgba(17, 24, 39, 0.03);
+
+  pointer-events: none;
+
+  user-select: none;
+
+  white-space: nowrap;
+}
+
+/*==========================================
+  PREMIUM HOVER
+==========================================*/
+
+.quote-document {
+  transition:
+    transform 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+.quote-document:hover {
+  transform: translateY(-6px);
+
+  box-shadow: 0 55px 110px rgba(0, 0, 0, 0.3);
+}
+
+/*==========================================
+  RESPONSIVE
+==========================================*/
+
+@media (max-width: 1200px) {
+  .quote-document {
+    position: relative;
+
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .quote-document {
+    padding: 28px;
+  }
+
+  .document-top {
+    flex-direction: column;
+  }
+
+  .quote-meta {
+    text-align: left;
+  }
+
+  .document-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .document-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .signature {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .quote-document::after {
+    font-size: 55px;
+  }
+}
+
+@media (max-width: 520px) {
+  .document-top h2 {
+    font-size: 1.6rem;
+  }
+
+  .price-row.total strong {
+    font-size: 26px;
+  }
+
+  .company-tag {
+    font-size: 12px;
+  }
+}
+
+/*==========================================
+  PRINT MODE
+==========================================*/
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  .quote-generator {
+    padding: 0;
+
+    background: #fff;
+  }
+
+  .quote-form,
+  .quote-header,
+  .quote-glow {
+    display: none !important;
+  }
+
+  .quote-document {
+    position: relative;
+
+    box-shadow: none;
+
+    border: none;
+
+    max-width: 100%;
+
+    margin: 0;
+
+    padding: 0;
+  }
+
+  .document-actions {
+    display: none;
+  }
+}
+
+/*==========================================
+  PERFORMANCE
+==========================================*/
+
+.quote-document,
+.document-actions button {
+  will-change: transform;
+}
+
+.document-actions button {
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    opacity 0.35s ease;
+}

@@ -1,0 +1,263 @@
+/* ======================================================
+   PORTAL SPLASH
+====================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.portal-splash {
+  min-height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  padding: 30px;
+
+  overflow: hidden;
+
+  position: relative;
+
+  background:
+    radial-gradient(circle at top left, #1b4332 0%, transparent 30%),
+    radial-gradient(circle at bottom right, #14532d 0%, transparent 30%),
+    linear-gradient(135deg, #071018, #0b1220, #111827);
+}
+
+.portal-splash::before {
+  content: "";
+
+  position: absolute;
+
+  width: 420px;
+
+  height: 420px;
+
+  border-radius: 50%;
+
+  background: rgba(34, 197, 94, 0.08);
+
+  filter: blur(100px);
+
+  top: -160px;
+
+  right: -120px;
+}
+
+.portal-splash::after {
+  content: "";
+
+  position: absolute;
+
+  width: 320px;
+
+  height: 320px;
+
+  border-radius: 50%;
+
+  background: rgba(16, 185, 129, 0.06);
+
+  filter: blur(90px);
+
+  bottom: -120px;
+
+  left: -80px;
+}
+
+/* ===================================
+   CARD
+=================================== */
+
+.portal-card {
+  width: 100%;
+
+  max-width: 560px;
+
+  position: relative;
+
+  z-index: 2;
+
+  padding: 45px;
+
+  border-radius: 26px;
+
+  text-align: center;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(22px);
+
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+}
+/* ===================================
+   LOGO
+=================================== */
+
+.portal-logo {
+  width: 90px;
+
+  height: 90px;
+
+  margin: 0 auto 28px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 2rem;
+
+  font-weight: 800;
+
+  color: #ffffff;
+
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+
+  box-shadow: 0 15px 45px rgba(34, 197, 94, 0.35);
+}
+
+/* ===================================
+   TEXT
+=================================== */
+
+.portal-card h1 {
+  font-size: 2rem;
+
+  color: #ffffff;
+
+  font-weight: 700;
+
+  margin-bottom: 10px;
+}
+
+.portal-card p {
+  color: #94a3b8;
+
+  font-size: 1rem;
+
+  margin-bottom: 35px;
+}
+
+/* ===================================
+   PROGRESS
+=================================== */
+
+.portal-progress {
+  width: 100%;
+
+  height: 10px;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  margin-bottom: 35px;
+}
+
+.portal-progress-bar {
+  height: 100%;
+
+  border-radius: 999px;
+
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.45);
+}
+
+/* ===================================
+   STATUS LIST
+=================================== */
+
+.portal-status {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.status-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 14px 18px;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  color: #d1d5db;
+
+  font-size: 0.96rem;
+}
+
+.status-row svg:first-child {
+  color: #22c55e;
+
+  font-size: 1rem;
+}
+
+.status-row span {
+  flex: 1;
+
+  text-align: left;
+}
+
+.status-check {
+  color: #22c55e;
+}
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media (max-width: 768px) {
+  .portal-card {
+    padding: 32px 24px;
+  }
+
+  .portal-logo {
+    width: 72px;
+
+    height: 72px;
+
+    font-size: 1.6rem;
+  }
+
+  .portal-card h1 {
+    font-size: 1.6rem;
+  }
+
+  .portal-card p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .portal-card {
+    padding: 26px 18px;
+  }
+
+  .status-row {
+    padding: 12px 14px;
+
+    font-size: 0.9rem;
+  }
+}

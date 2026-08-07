@@ -1,0 +1,314 @@
+/* ===========================
+   REGISTER PAGE
+=========================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.register-page {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 50px 20px;
+
+  background:
+    radial-gradient(circle at top, rgba(212, 175, 55, 0.1), transparent 40%),
+    radial-gradient(
+      circle at bottom right,
+      rgba(0, 255, 180, 0.08),
+      transparent 35%
+    ),
+    #050816;
+
+  overflow: hidden;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 620px;
+
+  padding: 42px;
+
+  border-radius: 28px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(30px);
+
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.45),
+    0 0 50px rgba(212, 175, 55, 0.08);
+
+  overflow: hidden;
+}
+
+.register-logo {
+  width: 82px;
+  height: 82px;
+
+  margin: 0 auto 24px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #d4af37, #f7d36a);
+
+  color: #fff;
+
+  font-size: 34px;
+
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+}
+
+.register-card h1 {
+  text-align: center;
+
+  color: #fff;
+
+  font-size: 2rem;
+
+  margin-bottom: 10px;
+}
+
+.register-card > p {
+  text-align: center;
+
+  color: #9eaac2;
+
+  line-height: 1.7;
+
+  margin-bottom: 34px;
+}
+
+/* ===========================
+   GRID
+=========================== */
+
+.register-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+/* ===========================
+   FORM
+=========================== */
+
+.register-field {
+  margin-bottom: 22px;
+}
+
+.register-field label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #d8e2f1;
+
+  font-size: 0.95rem;
+
+  font-weight: 600;
+}
+
+.input-box {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+
+  left: 20px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #8f9cb3;
+
+  font-size: 16px;
+}
+
+.input-box input {
+  width: 100%;
+  max-width: 100%;
+  height: 60px;
+  box-sizing: border-box;
+  padding: 0 58px 0 54px;
+
+  border-radius: 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #fff;
+
+  outline: none;
+
+  font-size: 15px;
+
+  transition: 0.35s;
+}
+
+.input-box input:focus {
+  border-color: #d4af37;
+
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.12);
+}
+
+.input-box input::placeholder {
+  color: #7f8ca6;
+}
+
+/* ===========================
+   PASSWORD
+=========================== */
+
+.password-toggle {
+  position: absolute;
+
+  right: 18px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  border: none;
+
+  background: transparent;
+
+  color: #9aa6bd;
+
+  cursor: pointer;
+
+  font-size: 18px;
+
+  transition: 0.3s;
+}
+
+.password-toggle:hover {
+  color: #fff;
+}
+
+/* ===========================
+   BUTTON
+=========================== */
+
+.register-btn {
+  width: 100%;
+
+  height: 58px;
+
+  margin-top: 12px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  cursor: pointer;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  color: #08111f;
+
+  background: linear-gradient(135deg, #d4af37, #f7d36a);
+
+  transition: 0.35s;
+}
+
+.register-btn:hover {
+  box-shadow: 0 14px 35px rgba(212, 175, 55, 0.35);
+}
+
+/* ===========================
+   DIVIDER
+=========================== */
+
+.register-divider {
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+
+  margin: 34px 0 24px;
+}
+
+.register-divider::before,
+.register-divider::after {
+  content: "";
+
+  flex: 1;
+
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.register-divider span {
+  color: #7f8ca6;
+
+  font-size: 0.85rem;
+}
+
+.signin-link {
+  text-align: center;
+
+  color: #b8c3d6;
+}
+
+.signin-link a {
+  color: #d4af37;
+
+  text-decoration: none;
+
+  font-weight: 700;
+}
+
+.signin-link a:hover {
+  color: #fff;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 768px) {
+  .register-card {
+    padding: 34px 26px;
+  }
+
+  .register-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-card {
+    padding: 28px 22px;
+    border-radius: 22px;
+  }
+
+  .register-card h1 {
+    font-size: 1.7rem;
+  }
+
+  .register-card > p {
+    font-size: 0.92rem;
+  }
+}
