@@ -1,10 +1,19 @@
 import { motion } from "framer-motion";
-
 import { Link } from "react-router-dom";
 
 import { FaCircleCheck, FaUser, FaGear, FaArrowRight } from "react-icons/fa6";
 
 const AccountSnapshot = () => {
+  const account = {
+    firstName: "Sunkanmi",
+    lastName: "Ibrahim",
+    tier: "Standard",
+    region: "Nigeria",
+    verification: "Verified",
+  };
+
+  const initials = `${account.firstName.charAt(0)}${account.lastName.charAt(0)}`;
+
   return (
     <motion.section
       className="account-snapshot"
@@ -24,10 +33,12 @@ const AccountSnapshot = () => {
       }}
     >
       <div className="account-header">
-        <div className="account-avatar">SI</div>
+        <div className="account-avatar">{initials}</div>
 
         <div className="account-user">
-          <h3>Sunkanmi Ibrahim</h3>
+          <h3>
+            {account.firstName} {account.lastName}
+          </h3>
 
           <p>Customer Account</p>
         </div>
@@ -39,20 +50,21 @@ const AccountSnapshot = () => {
 
           <strong>
             <FaCircleCheck />
-            Verified
+
+            {account.verification}
           </strong>
         </div>
 
         <div className="account-status-row">
           <span>Membership</span>
 
-          <strong>Standard</strong>
+          <strong>{account.tier}</strong>
         </div>
 
         <div className="account-status-row">
           <span>Region</span>
 
-          <strong>United Kingdom</strong>
+          <strong>{account.region}</strong>
         </div>
       </div>
 

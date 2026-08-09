@@ -1,14 +1,11 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import DashboardLayout from "../layouts/DashboardLayout";
 import TrackShipment from "../components/tracking/TrackShipment";
 
 const TrackShipmentPage = () => {
   return (
-    <>
-      <Navbar />
+    <DashboardLayout>
       <TrackShipment />
-      <Footer />
-    </>
+    </DashboardLayout>
   );
 };
 

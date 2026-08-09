@@ -8,11 +8,12 @@ import ForgotPassword from "./pages/ForgotPassword";
 
 import Home from "./pages/Home";
 import TrackShipmentPage from "./pages/TrackShipmentPage";
-import QuoteGeneratorPage from "./pages/QuoteGeneratorPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import BookShipment from "./pages/Booking";
 import ShipmentHistory from "./pages/ShipmentHistory";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -84,10 +85,19 @@ function App() {
       />
 
       <Route
-        path="/quote"
+        path="/profile"
         element={
           <ProtectedRoute>
-            <QuoteGeneratorPage />
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         }
       />

@@ -1,0 +1,977 @@
+/* =========================================================
+   LORDTAYLOR CARGO — SETTINGS
+========================================================= */
+
+.settings-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 44px 44px 90px;
+  color: #f5f5f5;
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.settings-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 34px;
+}
+
+.settings-kicker {
+  display: block;
+  margin-bottom: 11px;
+  color: #8f8f8f;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+}
+
+.settings-page-header h1 {
+  margin: 0;
+  color: #f6f6f6;
+  font-size: 44px;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+
+.settings-page-header p {
+  max-width: 650px;
+  margin: 13px 0 0;
+  color: #929292;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   GLOBAL BUTTON
+========================================================= */
+
+.settings-save-button {
+  flex-shrink: 0;
+  min-height: 46px;
+  padding: 0 19px;
+  border: 1px solid #303030;
+  border-radius: 9px;
+  background: #f2f2f2;
+  color: #111111;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.settings-save-button:hover {
+  transform: translateY(-1px);
+  border-color: #444;
+  background: #ffffff;
+}
+
+/* =========================================================
+   SAVE NOTICE
+========================================================= */
+
+.settings-save-notice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding: 17px 19px;
+  border: 1px solid #294332;
+  border-radius: 12px;
+  background: #111b15;
+}
+
+.settings-save-notice > span {
+  display: grid;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: #1e693b;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.settings-save-notice strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #eeeeee;
+  font-size: 14px;
+}
+
+.settings-save-notice p {
+  margin: 0;
+  color: #91a097;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SETTINGS CARDS
+========================================================= */
+
+.settings-card {
+  margin-bottom: 24px;
+  padding: 31px;
+  border: 1px solid #242424;
+  border-radius: 16px;
+  background: #111111;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* =========================================================
+   PANEL HEADING
+========================================================= */
+
+.settings-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid #222222;
+}
+
+.settings-panel-number {
+  display: grid;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid #303030;
+  border-radius: 9px;
+  background: #151515;
+  color: #888888;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.settings-panel-kicker {
+  display: block;
+  margin-bottom: 7px;
+  color: #787878;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.settings-panel-heading h2 {
+  margin: 0;
+  color: #f0f0f0;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.settings-panel-heading p {
+  max-width: 650px;
+  margin: 8px 0 0;
+  color: #858585;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   SETTINGS OPTIONS
+========================================================= */
+
+.settings-options {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  min-height: 80px;
+  padding: 18px 0;
+  border-bottom: 1px solid #202020;
+}
+
+.settings-option:last-child {
+  border-bottom: 0;
+}
+
+.settings-option-icon {
+  display: grid;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #2b2b2b;
+  border-radius: 10px;
+  background: #161616;
+  color: #a2a2a2;
+  font-size: 15px;
+}
+
+.settings-option-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-option-content strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #e9e9e9;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.settings-option-content p {
+  margin: 0;
+  color: #7f7f7f;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   TOGGLE
+========================================================= */
+
+.settings-toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 27px;
+  padding: 0;
+  border: 1px solid #363636;
+  border-radius: 999px;
+  background: #202020;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.settings-toggle span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #898989;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.settings-toggle.active {
+  border-color: #eeeeee;
+  background: #eeeeee;
+}
+
+.settings-toggle.active span {
+  transform: translateX(21px);
+  background: #111111;
+}
+
+/* =========================================================
+   DISPLAY FORM
+========================================================= */
+
+.settings-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 19px;
+  padding: 27px 0 20px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.settings-field label {
+  color: #999999;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.settings-field select,
+.settings-field input {
+  width: 100%;
+  min-height: 49px;
+  padding: 0 14px;
+  border: 1px solid #2c2c2c;
+  border-radius: 9px;
+  outline: none;
+  background: #171717;
+  color: #e8e8e8;
+  font-family: inherit;
+  font-size: 13px;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.settings-field select {
+  cursor: pointer;
+}
+
+.settings-field input::placeholder {
+  color: #606060;
+}
+
+.settings-field select:hover,
+.settings-field input:hover {
+  border-color: #3a3a3a;
+}
+
+.settings-field select:focus,
+.settings-field input:focus {
+  border-color: #555555;
+  background: #191919;
+}
+
+/* =========================================================
+   APPEARANCE
+========================================================= */
+
+.settings-theme-option {
+  border-top: 1px solid #202020;
+  border-bottom: 0;
+  padding-top: 22px;
+}
+
+.settings-theme-option > select {
+  flex-shrink: 0;
+  width: 150px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  outline: none;
+  background: #171717;
+  color: #dddddd;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   ACCOUNT MANAGEMENT
+========================================================= */
+
+.settings-account-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 23px 0;
+  border-bottom: 1px solid #202020;
+}
+
+.settings-account-row:last-child {
+  border-bottom: 0;
+}
+
+.settings-account-row > div {
+  min-width: 0;
+}
+
+.settings-account-row strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #e9e9e9;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.settings-account-row p {
+  max-width: 680px;
+  margin: 0;
+  color: #777777;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.settings-secondary-button {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: transparent;
+  color: #dddddd;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.settings-secondary-button:hover {
+  border-color: #464646;
+  background: #191919;
+}
+
+/* =========================================================
+   COMING SOON
+========================================================= */
+
+.settings-coming-soon {
+  flex-shrink: 0;
+  padding: 7px 11px;
+  border: 1px solid #2c2c2c;
+  border-radius: 999px;
+  background: #161616;
+  color: #777777;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* =========================================================
+   DANGER ZONE
+========================================================= */
+
+.settings-account-row.danger-row {
+  padding-top: 27px;
+}
+
+.settings-danger-button {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid #482727;
+  border-radius: 8px;
+  background: #1a1111;
+  color: #c98282;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.settings-danger-button:hover {
+  border-color: #673737;
+  background: #211313;
+}
+
+/* =========================================================
+   PAYMENT SETTINGS
+========================================================= */
+
+.payment-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 26px 0 20px;
+}
+
+/* =========================================================
+   PAYMENT METHOD
+========================================================= */
+
+.payment-method {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  min-height: 92px;
+  padding: 17px 18px;
+  border: 1px solid #272727;
+  border-radius: 12px;
+  background: #151515;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.payment-method:hover {
+  border-color: #353535;
+  background: #171717;
+}
+
+.payment-method-default {
+  border-color: #3a3a3a;
+  background: #171717;
+}
+
+/* =========================================================
+   PAYMENT ICON
+========================================================= */
+
+.payment-method-icon {
+  display: grid;
+  flex-shrink: 0;
+  width: 50px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #383838;
+  border-radius: 7px;
+  background: #0f0f0f;
+  color: #e7e7e7;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   PAYMENT DETAILS
+========================================================= */
+
+.payment-method-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.payment-method-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 5px;
+}
+
+.payment-method-title strong {
+  color: #eeeeee;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.payment-default-badge {
+  padding: 4px 8px;
+  border: 1px solid #294332;
+  border-radius: 999px;
+  background: #142219;
+  color: #81b393;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.payment-card-number {
+  display: block;
+  margin-bottom: 6px;
+  color: #d0d0d0;
+  font-family: monospace;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+
+.payment-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: #707070;
+  font-size: 11px;
+}
+
+.payment-card-meta span + span {
+  position: relative;
+  padding-left: 14px;
+}
+
+.payment-card-meta span + span::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #555555;
+  content: "";
+  transform: translateY(-50%);
+}
+
+/* =========================================================
+   PAYMENT ACTIONS
+========================================================= */
+
+.payment-method-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.payment-default-button,
+.payment-remove-button {
+  min-height: 35px;
+  padding: 0 11px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.payment-default-button {
+  border: 1px solid #343434;
+  background: transparent;
+  color: #cccccc;
+}
+
+.payment-default-button:hover {
+  border-color: #505050;
+  background: #202020;
+}
+
+.payment-remove-button {
+  border: 1px solid #3b2727;
+  background: transparent;
+  color: #aa7777;
+}
+
+.payment-remove-button:hover {
+  border-color: #5b3535;
+  background: #201515;
+}
+
+/* =========================================================
+   EMPTY PAYMENT STATE
+========================================================= */
+
+.payment-empty-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 36px 20px;
+  border: 1px dashed #303030;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.payment-empty-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 13px;
+  place-items: center;
+  border: 1px solid #303030;
+  border-radius: 50%;
+  color: #858585;
+  font-size: 20px;
+}
+
+.payment-empty-state strong {
+  margin-bottom: 6px;
+  color: #dddddd;
+  font-size: 14px;
+}
+
+.payment-empty-state p {
+  max-width: 400px;
+  margin: 0;
+  color: #707070;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   ADD PAYMENT BUTTON
+========================================================= */
+
+.payment-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: transparent;
+  color: #dddddd;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.payment-add-button span {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.payment-add-button:hover {
+  border-color: #474747;
+  background: #191919;
+}
+
+/* =========================================================
+   ADD PAYMENT FORM
+========================================================= */
+
+.payment-add-form {
+  margin-top: 6px;
+  padding: 23px;
+  border: 1px solid #292929;
+  border-radius: 12px;
+  background: #151515;
+}
+
+.payment-form-heading {
+  margin-bottom: 22px;
+}
+
+.payment-form-heading strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #ededed;
+  font-size: 15px;
+}
+
+.payment-form-heading p {
+  margin: 0;
+  color: #777777;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.payment-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.payment-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid #242424;
+}
+
+/* =========================================================
+   PAYMENT SECURITY NOTE
+========================================================= */
+
+.payment-security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 15px 16px;
+  border: 1px solid #242424;
+  border-radius: 10px;
+  background: #131313;
+}
+
+.payment-security-note > span {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.payment-security-note strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #c8c8c8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.payment-security-note p {
+  max-width: 720px;
+  margin: 0;
+  color: #686868;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .settings-page {
+    padding: 36px 28px 70px;
+  }
+
+  .settings-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .settings-save-button {
+    width: 100%;
+  }
+
+  .settings-card {
+    padding: 25px;
+  }
+
+  .settings-form,
+  .payment-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-method {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .payment-method-actions {
+    width: 100%;
+    padding-left: 67px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .settings-page {
+    padding: 28px 18px 60px;
+  }
+
+  .settings-page-header {
+    margin-bottom: 27px;
+  }
+
+  .settings-page-header h1 {
+    font-size: 35px;
+  }
+
+  .settings-page-header p {
+    font-size: 13px;
+  }
+
+  .settings-card {
+    padding: 20px;
+    border-radius: 13px;
+  }
+
+  .settings-panel-heading {
+    gap: 13px;
+  }
+
+  .settings-panel-number {
+    width: 35px;
+    height: 35px;
+  }
+
+  .settings-panel-heading h2 {
+    font-size: 19px;
+  }
+
+  .settings-panel-heading p {
+    font-size: 12px;
+  }
+
+  .settings-option {
+    align-items: flex-start;
+  }
+
+  .settings-option-icon {
+    width: 37px;
+    height: 37px;
+  }
+
+  .settings-option-content strong {
+    font-size: 13px;
+  }
+
+  .settings-option-content p {
+    font-size: 11px;
+  }
+
+  .settings-theme-option {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .settings-theme-option > select {
+    width: 100%;
+  }
+
+  .settings-account-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .settings-secondary-button,
+  .settings-danger-button {
+    width: 100%;
+  }
+
+  .settings-coming-soon {
+    align-self: flex-start;
+  }
+
+  /* Payment mobile */
+
+  .payment-method {
+    gap: 13px;
+    padding: 15px;
+  }
+
+  .payment-method-icon {
+    width: 45px;
+    height: 33px;
+  }
+
+  .payment-method-details {
+    width: calc(100% - 60px);
+  }
+
+  .payment-method-actions {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .payment-default-button,
+  .payment-remove-button {
+    flex: 1;
+  }
+
+  .payment-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .payment-form-actions .settings-secondary-button,
+  .payment-form-actions .settings-save-button {
+    width: 100%;
+  }
+
+  .payment-add-button {
+    width: 100%;
+  }
+
+  .payment-security-note {
+    padding: 13px;
+  }
+}

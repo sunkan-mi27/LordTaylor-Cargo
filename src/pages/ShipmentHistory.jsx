@@ -1,41 +1,14 @@
 import { useMemo, useState } from "react";
+
 import ShipmentDetailsDrawer from "../components/ShipmentDetailsDrawer";
 import DashboardLayout from "../layouts/DashboardLayout";
 import ShipmentSearch from "../components/ShipmentSearch";
 import ShipmentFilter from "../components/ShipmentFilter";
 import ShipmentCard from "../components/ShipmentCard";
 
-import "../styles/shipment-history.css";
+import shipments from "../data/shipments";
 
-const shipments = [
-  {
-    id: "LT-78291KD",
-    from: "London, UK",
-    to: "Lagos, NG",
-    weight: "12 kg",
-    type: "Electronics",
-    status: "In Transit",
-    date: "6 Aug 2026",
-  },
-  {
-    id: "LT-1827AAK",
-    from: "Manchester, UK",
-    to: "Abuja, NG",
-    weight: "3 kg",
-    type: "Documents",
-    status: "Booked",
-    date: "2 Aug 2026",
-  },
-  {
-    id: "LT-9932KDL",
-    from: "Birmingham, UK",
-    to: "Port Harcourt",
-    weight: "20 kg",
-    type: "Machinery",
-    status: "Delivered",
-    date: "28 Jul 2026",
-  },
-];
+import "../styles/shipment-history.css";
 
 export default function ShipmentHistory() {
   const [selectedShipment, setSelectedShipment] = useState(null);
@@ -51,9 +24,12 @@ export default function ShipmentHistory() {
 
   const filteredShipments = useMemo(() => {
     return shipments.filter((shipment) => {
-      const matchesSearch = shipment.id
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase().trim());
+      const search = searchTerm.toLowerCase().trim();
+
+      const matchesSearch =
+        shipment.trackingNumber.toLowerCase().includes(search) ||
+        shipment.destination.toLowerCase().includes(search) ||
+        shipment.receiver.name.toLowerCase().includes(search);
 
       const matchesFilter =
         activeFilter === "All" || shipment.status === activeFilter;
@@ -65,6 +41,8 @@ export default function ShipmentHistory() {
   return (
     <DashboardLayout>
       <div className="shipment-history-page">
+        {/* HEADER */}
+
         <div className="shipment-history-header">
           <span className="shipment-history-badge">Shipment Center</span>
 
@@ -73,12 +51,18 @@ export default function ShipmentHistory() {
           <p>Track every shipment you've booked with LordTaylor Logistics.</p>
         </div>
 
+        {/* SEARCH */}
+
         <ShipmentSearch value={searchTerm} onChange={setSearchTerm} />
+
+        {/* FILTER */}
 
         <ShipmentFilter
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}
         />
+
+        {/* SHIPMENTS */}
 
         {filteredShipments.length > 0 ? (
           <div className="shipment-list">
@@ -112,6 +96,8 @@ export default function ShipmentHistory() {
             </button>
           </div>
         )}
+
+        {/* DETAILS DRAWER */}
 
         <ShipmentDetailsDrawer
           shipment={selectedShipment}

@@ -7,42 +7,57 @@ import {
   FaClipboardList,
 } from "react-icons/fa6";
 
+import shipments from "../../data/shipments";
+
 const DashboardStats = () => {
+  const activeShipments = shipments.filter(
+    (shipment) => shipment.statusType === "transit",
+  ).length;
+
+  const deliveredShipments = shipments.filter(
+    (shipment) => shipment.statusType === "delivered",
+  ).length;
+
+  const totalShipments = shipments.length;
+
   const stats = [
     {
       id: 1,
       title: "Active Shipments",
-      value: "14",
-      icon: <FaShip />,
+      value: activeShipments,
+      icon: FaShip,
       color: "#22c55e",
-      change: "+12%",
+      change: `${activeShipments} active`,
       positive: true,
     },
+
     {
       id: 2,
       title: "Delivered",
-      value: "128",
-      icon: <FaCircleCheck />,
+      value: deliveredShipments,
+      icon: FaCircleCheck,
       color: "#3b82f6",
-      change: "+8%",
+      change: `${deliveredShipments} completed`,
       positive: true,
     },
+
     {
       id: 3,
-      title: "Pending Quotes",
-      value: "6",
-      icon: <FaClipboardList />,
+      title: "Total Shipments",
+      value: totalShipments,
+      icon: FaClipboardList,
       color: "#f59e0b",
-      change: "+2",
+      change: "All time",
       positive: true,
     },
+
     {
       id: 4,
-      title: "Payments Due",
-      value: "£2,480",
-      icon: <FaFileInvoiceDollar />,
+      title: "Pending Quotes",
+      value: "—",
+      icon: FaFileInvoiceDollar,
       color: "#ef4444",
-      change: "-1",
+      change: "Coming soon",
       positive: false,
     },
   ];

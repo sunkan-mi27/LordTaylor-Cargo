@@ -11,7 +11,7 @@ import "../styles/dashboard.css";
 
 const Dashboard = () => {
   return (
-    <DashboardLayout>
+    <DashboardLayout showTopbar>
       <DashboardHero />
 
       <DashboardStats />

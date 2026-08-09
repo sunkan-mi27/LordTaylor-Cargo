@@ -1,42 +1,43 @@
 import { motion } from "framer-motion";
+import { FaCircleCheck, FaShip, FaBoxOpen } from "react-icons/fa6";
 
-import { FaCircleCheck, FaShip, FaBoxOpen, FaBell } from "react-icons/fa6";
+import shipments from "../../data/shipments";
 
-const activities = [
-  {
-    id: 1,
-    icon: <FaShip />,
-    color: "#3b82f6",
-    title: "Shipment departed from London Hub",
-    time: "12 mins ago",
-  },
+const getActivityIcon = (shipment) => {
+  if (shipment.statusType === "delivered") {
+    return FaCircleCheck;
+  }
 
-  {
-    id: 2,
-    icon: <FaBoxOpen />,
-    color: "#f59e0b",
-    title: "Shipment arrived at Lagos Distribution Centre",
-    time: "1 hour ago",
-  },
+  if (shipment.statusType === "transit") {
+    return FaShip;
+  }
 
-  {
-    id: 3,
-    icon: <FaCircleCheck />,
-    color: "#22c55e",
-    title: "Shipment LT-24073 successfully delivered",
-    time: "Yesterday",
-  },
+  return FaBoxOpen;
+};
 
-  {
-    id: 4,
-    icon: <FaBell />,
-    color: "#8b5cf6",
-    title: "New shipping quote generated",
-    time: "2 days ago",
-  },
-];
+const getActivityColor = (shipment) => {
+  if (shipment.statusType === "delivered") {
+    return "#22c55e";
+  }
+
+  if (shipment.statusType === "transit") {
+    return "#3b82f6";
+  }
+
+  return "#f59e0b";
+};
 
 const ActivityFeed = () => {
+  const activities = shipments.slice(0, 4).map((shipment) => ({
+    id: shipment.id,
+    shipment,
+    title:
+      shipment.statusType === "delivered"
+        ? `Shipment ${shipment.trackingNumber} successfully delivered`
+        : `${shipment.trackingNumber} is currently in transit`,
+    time: shipment.lastUpdate,
+  }));
+
   return (
     <section className="activity-feed">
       <div className="section-heading">
@@ -48,43 +49,48 @@ const ActivityFeed = () => {
       </div>
 
       <div className="activity-list">
-        {activities.map((activity, index) => (
-          <motion.div
-            key={activity.id}
-            className="activity-item"
-            initial={{
-              opacity: 0,
-              x: -20,
-            }}
-            whileInView={{
-              opacity: 1,
-              x: 0,
-            }}
-            viewport={{
-              once: true,
-            }}
-            transition={{
-              delay: index * 0.08,
-              duration: 0.35,
-            }}
-          >
-            <div
-              className="activity-icon"
-              style={{
-                background: `${activity.color}18`,
-                color: activity.color,
+        {activities.map((activity, index) => {
+          const Icon = getActivityIcon(activity.shipment);
+          const color = getActivityColor(activity.shipment);
+
+          return (
+            <motion.div
+              key={activity.id}
+              className="activity-item"
+              initial={{
+                opacity: 0,
+                x: -20,
+              }}
+              whileInView={{
+                opacity: 1,
+                x: 0,
+              }}
+              viewport={{
+                once: true,
+              }}
+              transition={{
+                delay: index * 0.08,
+                duration: 0.35,
               }}
             >
-              {activity.icon}
-            </div>
+              <div
+                className="activity-icon"
+                style={{
+                  background: `${color}18`,
+                  color,
+                }}
+              >
+                <Icon />
+              </div>
 
-            <div className="activity-content">
-              <h4>{activity.title}</h4>
+              <div className="activity-content">
+                <h4>{activity.title}</h4>
 
-              <span>{activity.time}</span>
-            </div>
-          </motion.div>
-        ))}
+                <span>{activity.time}</span>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );

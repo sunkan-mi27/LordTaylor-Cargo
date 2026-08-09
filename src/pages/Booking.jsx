@@ -1,16 +1,26 @@
 import { useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { useNavigate } from "react-router-dom";
+
 import "../styles/booking.css";
 
 const BookShipment = () => {
   const navigate = useNavigate();
+
+  /* =========================================
+     BOOKING STATE
+  ========================================= */
+
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingComplete, setBookingComplete] = useState(false);
   const [creatingShipment, setCreatingShipment] = useState(false);
   const [trackingId, setTrackingId] = useState("");
   const [errors, setErrors] = useState({});
-  const [isBooking, setIsBooking] = useState(false);
+
+  /* =========================================
+     SENDER
+  ========================================= */
+
   const [sender, setSender] = useState({
     fullName: "",
     email: "",
@@ -22,6 +32,10 @@ const BookShipment = () => {
     address: "",
   });
 
+  /* =========================================
+     RECEIVER
+  ========================================= */
+
   const [receiver, setReceiver] = useState({
     fullName: "",
     email: "",
@@ -32,6 +46,11 @@ const BookShipment = () => {
     postalCode: "",
     address: "",
   });
+
+  /* =========================================
+     PARCEL
+  ========================================= */
+
   const [parcel, setParcel] = useState({
     packageType: "Standard Box",
     weight: "",
@@ -40,18 +59,34 @@ const BookShipment = () => {
     width: "",
     height: "",
     description: "",
+    shippingMethod: "Standard Delivery",
+    insurance: "No Insurance",
   });
+
+  /* =========================================
+     PAYMENT
+  ========================================= */
+
+  const [payment, setPayment] = useState({
+    method: "Visa",
+    lastFour: "4242",
+    cardholder: "Sunkanmi Ibrahim",
+  });
+
+  /* =========================================
+     HANDLERS
+  ========================================= */
 
   const handleSenderChange = (e) => {
     const { name, value } = e.target;
 
-    setSender((prev) => ({
-      ...prev,
+    setSender((previous) => ({
+      ...previous,
       [name]: value,
     }));
 
-    setErrors((prev) => ({
-      ...prev,
+    setErrors((previous) => ({
+      ...previous,
       [name]: "",
     }));
   };
@@ -59,13 +94,13 @@ const BookShipment = () => {
   const handleReceiverChange = (e) => {
     const { name, value } = e.target;
 
-    setReceiver((prev) => ({
-      ...prev,
+    setReceiver((previous) => ({
+      ...previous,
       [name]: value,
     }));
 
-    setErrors((prev) => ({
-      ...prev,
+    setErrors((previous) => ({
+      ...previous,
       [name === "fullName"
         ? "receiverName"
         : name === "email"
@@ -77,60 +112,93 @@ const BookShipment = () => {
               : name]: "",
     }));
   };
+
   const handleParcelChange = (e) => {
     const { name, value } = e.target;
 
-    setParcel((prev) => ({
-      ...prev,
+    setParcel((previous) => ({
+      ...previous,
       [name]: value,
     }));
 
-    setErrors((prev) => ({
-      ...prev,
+    setErrors((previous) => ({
+      ...previous,
       [name]: "",
     }));
   };
 
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+
+    setPayment((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  /* =========================================
+     VALIDATION
+  ========================================= */
+
   const validateStep = () => {
     const newErrors = {};
 
-    // STEP 1
     if (currentStep === 1) {
-      if (!sender.fullName.trim()) newErrors.fullName = "Full name is required";
+      if (!sender.fullName.trim()) {
+        newErrors.fullName = "Full name is required";
+      }
 
-      if (!sender.email.trim()) newErrors.email = "Email is required";
+      if (!sender.email.trim()) {
+        newErrors.email = "Email is required";
+      }
 
-      if (!sender.phone.trim()) newErrors.phone = "Phone number is required";
+      if (!sender.phone.trim()) {
+        newErrors.phone = "Phone number is required";
+      }
 
-      if (!sender.address.trim())
+      if (!sender.address.trim()) {
         newErrors.address = "Collection address is required";
+      }
     }
 
-    // STEP 2
     if (currentStep === 2) {
-      if (!receiver.fullName.trim())
+      if (!receiver.fullName.trim()) {
         newErrors.receiverName = "Receiver name is required";
+      }
 
-      if (!receiver.email.trim()) newErrors.receiverEmail = "Email is required";
+      if (!receiver.email.trim()) {
+        newErrors.receiverEmail = "Email is required";
+      }
 
-      if (!receiver.phone.trim())
+      if (!receiver.phone.trim()) {
         newErrors.receiverPhone = "Phone number is required";
+      }
 
-      if (!receiver.address.trim())
+      if (!receiver.address.trim()) {
         newErrors.receiverAddress = "Delivery address is required";
+      }
     }
 
-    // STEP 3
     if (currentStep === 3) {
-      if (!parcel.weight.trim()) newErrors.weight = "Weight is required";
+      if (!parcel.weight.trim()) {
+        newErrors.weight = "Weight is required";
+      }
 
-      if (!parcel.value.trim()) newErrors.value = "Parcel value is required";
+      if (!parcel.value.trim()) {
+        newErrors.value = "Parcel value is required";
+      }
 
-      if (!parcel.length.trim()) newErrors.length = "Length is required";
+      if (!parcel.length.trim()) {
+        newErrors.length = "Length is required";
+      }
 
-      if (!parcel.width.trim()) newErrors.width = "Width is required";
+      if (!parcel.width.trim()) {
+        newErrors.width = "Width is required";
+      }
 
-      if (!parcel.height.trim()) newErrors.height = "Height is required";
+      if (!parcel.height.trim()) {
+        newErrors.height = "Height is required";
+      }
     }
 
     setErrors(newErrors);
@@ -138,14 +206,73 @@ const BookShipment = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  /* =========================================
+     PACKAGE SELECTOR
+  ========================================= */
+
   const selectPackage = (type) => {
-    setParcel((prev) => ({
-      ...prev,
+    setParcel((previous) => ({
+      ...previous,
       packageType: type,
     }));
   };
 
-  const handleBooking = () => {
+  /* =========================================
+     NAVIGATION
+  ========================================= */
+
+  const goNext = () => {
+    if (!validateStep()) return;
+
+    setCurrentStep((previous) => previous + 1);
+  };
+
+  const goBack = () => {
+    setErrors({});
+
+    setCurrentStep((previous) => Math.max(1, previous - 1));
+  };
+
+  /* =========================================
+     SHIPPING PRICE
+  ========================================= */
+
+  const getShippingPrice = () => {
+    if (parcel.shippingMethod === "Express Delivery") {
+      return 85;
+    }
+
+    return 45;
+  };
+
+  const getInsurancePrice = () => {
+    if (parcel.insurance === "Basic Insurance") {
+      return 12;
+    }
+
+    if (parcel.insurance === "Premium Insurance") {
+      return 25;
+    }
+
+    return 0;
+  };
+
+  const shippingPrice = getShippingPrice();
+  const insurancePrice = getInsurancePrice();
+
+  const subtotal = shippingPrice + insurancePrice;
+
+  const serviceFee = Math.round(subtotal * 0.05);
+
+  const total = subtotal + serviceFee;
+
+  /* =========================================
+     PAYMENT
+  ========================================= */
+
+  const handleConfirmPayment = () => {
+    if (creatingShipment) return;
+
     setCreatingShipment(true);
 
     setTimeout(() => {
@@ -157,17 +284,89 @@ const BookShipment = () => {
       setTrackingId(id);
 
       setCreatingShipment(false);
-
       setBookingComplete(true);
-    }, 2500);
+    }, 2200);
   };
+
+  /* =========================================
+     SUCCESS
+  ========================================= */
+
+  if (bookingComplete) {
+    return (
+      <DashboardLayout>
+        <main className="booking-page">
+          <section className="booking-success-card">
+            <div className="booking-success-icon">✓</div>
+
+            <span className="booking-badge">Shipment Confirmed</span>
+
+            <h1>Booking Successful</h1>
+
+            <p>
+              Your shipment has been successfully created and is now ready for
+              processing.
+            </p>
+
+            <div className="booking-tracking-box">
+              <span>TRACKING ID</span>
+
+              <strong>{trackingId}</strong>
+
+              <small>
+                Keep this tracking ID safe. You can use it to monitor your
+                shipment.
+              </small>
+            </div>
+
+            <div className="booking-success-summary">
+              <div>
+                <span>From</span>
+                <strong>{sender.city || sender.country}</strong>
+              </div>
+
+              <div>
+                <span>To</span>
+                <strong>{receiver.city || receiver.country}</strong>
+              </div>
+
+              <div>
+                <span>Total Paid</span>
+                <strong>£{total.toFixed(2)}</strong>
+              </div>
+            </div>
+
+            <div className="booking-success-actions">
+              <button
+                type="button"
+                onClick={() => navigate("/track")}
+                className="booking-primary-button"
+              >
+                Track Shipment
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate("/history")}
+                className="booking-secondary-button"
+              >
+                View Shipment History
+              </button>
+            </div>
+          </section>
+        </main>
+      </DashboardLayout>
+    );
+  }
+
+  /* =========================================
+     PAGE
+  ========================================= */
 
   return (
     <DashboardLayout>
-      <div className="booking-page">
-        {/* ===========================
-              PAGE HEADER
-        =========================== */}
+      <main className="booking-page">
+        {/* PAGE HEADER */}
 
         <div className="booking-header">
           <div>
@@ -182,12 +381,10 @@ const BookShipment = () => {
           </div>
         </div>
 
-        {/* ===========================
-              STEP INDICATOR
-        =========================== */}
+        {/* STEP INDICATOR */}
 
         <div className="booking-steps">
-          {[1, 2, 3, 4].map((step) => (
+          {[1, 2, 3, 4, 5].map((step) => (
             <div key={step} className="step">
               <span
                 className={`step-circle ${
@@ -214,19 +411,18 @@ const BookShipment = () => {
                 {step === 2 && "Receiver"}
                 {step === 3 && "Parcel"}
                 {step === 4 && "Review"}
+                {step === 5 && "Payment"}
               </p>
             </div>
           ))}
         </div>
 
-        {/* ===========================
-              FORM CARD
-        =========================== */}
+        {/* FORM */}
 
-        <form className="booking-form">
-          {/* ===========================
-        STEP 1
-  =========================== */}
+        <form className="booking-form" onSubmit={(e) => e.preventDefault()}>
+          {/* =====================================
+              STEP 1 — SENDER
+          ===================================== */}
 
           {currentStep === 1 && (
             <>
@@ -239,6 +435,7 @@ const BookShipment = () => {
               <div className="form-grid">
                 <div className="form-group">
                   <label>Full Name</label>
+
                   <input
                     type="text"
                     name="fullName"
@@ -246,11 +443,17 @@ const BookShipment = () => {
                     onChange={handleSenderChange}
                     placeholder="John Smith"
                     className={errors.fullName ? "input-error" : ""}
+                    autoComplete="name"
                   />
+
+                  {errors.fullName && (
+                    <small className="form-error">{errors.fullName}</small>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label>Email Address</label>
+
                   <input
                     type="email"
                     name="email"
@@ -258,11 +461,17 @@ const BookShipment = () => {
                     onChange={handleSenderChange}
                     placeholder="john@email.com"
                     className={errors.email ? "input-error" : ""}
+                    autoComplete="email"
                   />
+
+                  {errors.email && (
+                    <small className="form-error">{errors.email}</small>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label>Phone Number</label>
+
                   <input
                     type="tel"
                     name="phone"
@@ -270,7 +479,12 @@ const BookShipment = () => {
                     onChange={handleSenderChange}
                     placeholder="+44 7000 000000"
                     className={errors.phone ? "input-error" : ""}
+                    autoComplete="tel"
                   />
+
+                  {errors.phone && (
+                    <small className="form-error">{errors.phone}</small>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -283,71 +497,120 @@ const BookShipment = () => {
                   >
                     <option>United Kingdom</option>
                     <option>Nigeria</option>
+                    <option>United States</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="form-group full-width">
-                <label>Collection Address</label>
+                <div className="form-group">
+                  <label>State / Region</label>
 
-                <textarea
-                  rows="5"
-                  name="address"
-                  value={sender.address}
-                  onChange={handleSenderChange}
-                  placeholder="Enter full collection address..."
-                  className={errors.address ? "input-error" : ""}
-                />
+                  <input
+                    type="text"
+                    name="state"
+                    value={sender.state}
+                    onChange={handleSenderChange}
+                    placeholder="Greater London"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>City</label>
+
+                  <input
+                    type="text"
+                    name="city"
+                    value={sender.city}
+                    onChange={handleSenderChange}
+                    placeholder="London"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Postal Code</label>
+
+                  <input
+                    type="text"
+                    name="postalCode"
+                    value={sender.postalCode}
+                    onChange={handleSenderChange}
+                    placeholder="SW1A 1AA"
+                    autoComplete="postal-code"
+                  />
+                </div>
+
+                <div className="form-group form-group-full">
+                  <label>Collection Address</label>
+
+                  <textarea
+                    name="address"
+                    value={sender.address}
+                    onChange={handleSenderChange}
+                    placeholder="Enter the full collection address"
+                    rows="4"
+                    className={errors.address ? "input-error" : ""}
+                    autoComplete="street-address"
+                  />
+
+                  {errors.address && (
+                    <small className="form-error">{errors.address}</small>
+                  )}
+                </div>
               </div>
             </>
           )}
 
-          {/* ===========================
-        STEP 2
-  =========================== */}
+          {/* =====================================
+              STEP 2 — RECEIVER
+          ===================================== */}
 
           {currentStep === 2 && (
             <>
               <div className="booking-card-header">
                 <h2>Receiver Information</h2>
 
-                <p>Tell us where the shipment should be delivered.</p>
+                <p>Enter the details of the person receiving this shipment.</p>
               </div>
 
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Receiver Name</label>
+                  <label>Full Name</label>
+
                   <input
                     type="text"
                     name="fullName"
                     value={receiver.fullName}
                     onChange={handleReceiverChange}
-                    placeholder="Receiver Full Name"
+                    placeholder="Jane Doe"
                     className={errors.receiverName ? "input-error" : ""}
+                    autoComplete="name"
                   />
+
                   {errors.receiverName && (
-                    <small className="error-text">{errors.receiverName}</small>
+                    <small className="form-error">{errors.receiverName}</small>
                   )}
                 </div>
 
                 <div className="form-group">
                   <label>Email Address</label>
+
                   <input
                     type="email"
                     name="email"
                     value={receiver.email}
                     onChange={handleReceiverChange}
-                    placeholder="receiver@email.com"
+                    placeholder="jane@email.com"
                     className={errors.receiverEmail ? "input-error" : ""}
+                    autoComplete="email"
                   />
 
                   {errors.receiverEmail && (
-                    <small className="error-text">{errors.receiverEmail}</small>
+                    <small className="form-error">{errors.receiverEmail}</small>
                   )}
                 </div>
 
                 <div className="form-group">
                   <label>Phone Number</label>
+
                   <input
                     type="tel"
                     name="phone"
@@ -355,10 +618,11 @@ const BookShipment = () => {
                     onChange={handleReceiverChange}
                     placeholder="+234 800 000 0000"
                     className={errors.receiverPhone ? "input-error" : ""}
+                    autoComplete="tel"
                   />
 
                   {errors.receiverPhone && (
-                    <small className="error-text">{errors.receiverPhone}</small>
+                    <small className="form-error">{errors.receiverPhone}</small>
                   )}
                 </div>
 
@@ -372,11 +636,13 @@ const BookShipment = () => {
                   >
                     <option>Nigeria</option>
                     <option>United Kingdom</option>
+                    <option>United States</option>
                   </select>
                 </div>
 
                 <div className="form-group">
                   <label>State</label>
+
                   <input
                     type="text"
                     name="state"
@@ -388,6 +654,7 @@ const BookShipment = () => {
 
                 <div className="form-group">
                   <label>City</label>
+
                   <input
                     type="text"
                     name="city"
@@ -399,569 +666,482 @@ const BookShipment = () => {
 
                 <div className="form-group">
                   <label>Postal Code</label>
+
                   <input
                     type="text"
                     name="postalCode"
                     value={receiver.postalCode}
                     onChange={handleReceiverChange}
-                    placeholder="101245"
+                    placeholder="101233"
+                    autoComplete="postal-code"
                   />
                 </div>
-              </div>
 
-              <div className="form-group full-width">
-                <label>Delivery Address</label>
+                <div className="form-group form-group-full">
+                  <label>Delivery Address</label>
 
-                <textarea
-                  rows="5"
-                  name="address"
-                  value={receiver.address}
-                  onChange={handleReceiverChange}
-                  placeholder="Enter full delivery address..."
-                  className={errors.receiverAddress ? "input-error" : ""}
-                />
+                  <textarea
+                    name="address"
+                    value={receiver.address}
+                    onChange={handleReceiverChange}
+                    placeholder="Enter the complete delivery address"
+                    rows="4"
+                    className={errors.receiverAddress ? "input-error" : ""}
+                    autoComplete="street-address"
+                  />
 
-                {errors.receiverAddress && (
-                  <small className="error-text">{errors.receiverAddress}</small>
-                )}
+                  {errors.receiverAddress && (
+                    <small className="form-error">
+                      {errors.receiverAddress}
+                    </small>
+                  )}
+                </div>
               </div>
             </>
           )}
-          {/* ===========================
-      STEP 3
-=========================== */}
+
+          {/* =====================================
+              STEP 3 — PARCEL
+          ===================================== */}
 
           {currentStep === 3 && (
             <>
               <div className="booking-card-header">
                 <h2>Parcel Information</h2>
 
-                <p>Tell us about the shipment you're sending.</p>
+                <p>
+                  Tell us what you're shipping and how it should be handled.
+                </p>
               </div>
 
-              <div className="parcel-layout">
-                {/* =====================
-            LEFT SIDE============= */}
+              <div className="package-selector">
+                {["Standard Box", "Document", "Fragile", "Custom Package"].map(
+                  (type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      className={
+                        parcel.packageType === type
+                          ? "package-option active"
+                          : "package-option"
+                      }
+                      onClick={() => selectPackage(type)}
+                    >
+                      {type}
+                    </button>
+                  ),
+                )}
+              </div>
 
-                <div className="parcel-form">
-                  <div className="package-type">
-                    <label>Package Type</label>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Weight (kg)</label>
 
-                    <div className="package-grid">
-                      <div
-                        className={`package-card ${
-                          parcel.packageType === "Standard Box" ? "active" : ""
-                        }`}
-                        onClick={() => selectPackage("Standard Box")}
-                      >
-                        <span>📦</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    name="weight"
+                    value={parcel.weight}
+                    onChange={handleParcelChange}
+                    placeholder="5"
+                    className={errors.weight ? "input-error" : ""}
+                  />
 
-                        <h4>Box</h4>
-
-                        <p>Standard Packages</p>
-                      </div>
-
-                      <div
-                        className={`package-card ${
-                          parcel.packageType === "Documents" ? "active" : ""
-                        }`}
-                        onClick={() => selectPackage("Documents")}
-                      >
-                        <span>📄</span>
-
-                        <h4>Documents</h4>
-
-                        <p>Files & Papers</p>
-                      </div>
-
-                      <div
-                        className={`package-card ${
-                          parcel.packageType === "Pallet" ? "active" : ""
-                        }`}
-                        onClick={() => selectPackage("Pallet")}
-                      >
-                        <span>🪵</span>
-
-                        <h4>Pallet</h4>
-
-                        <p>Bulk Cargo</p>
-                      </div>
-
-                      <div
-                        className={`package-card ${
-                          parcel.packageType === "Fragile" ? "active" : ""
-                        }`}
-                        onClick={() => selectPackage("Fragile")}
-                      >
-                        <span>🍷</span>
-
-                        <h4>Fragile</h4>
-
-                        <p>Handle Carefully</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-grid">
-                    <div className="form-group">
-                      <label>Weight (kg)</label>
-
-                      <input
-                        type="number"
-                        name="weight"
-                        value={parcel.weight}
-                        onChange={handleParcelChange}
-                        placeholder="0.00"
-                        className={errors.weight ? "input-error" : ""}
-                      />
-                      {errors.weight && (
-                        <small className="error-text">{errors.weight}</small>
-                      )}
-                    </div>
-
-                    <div className="form-group">
-                      <label>Declared Value (£)</label>
-
-                      <input
-                        type="number"
-                        name="value"
-                        value={parcel.value}
-                        onChange={handleParcelChange}
-                        placeholder="0.00"
-                        className={errors.value ? "input-error" : ""}
-                      />
-
-                      {errors.value && (
-                        <small className="error-text">{errors.value}</small>
-                      )}
-                    </div>
-
-                    <div className="form-group">
-                      <label>Length (cm)</label>
-
-                      <input
-                        type="number"
-                        name="length"
-                        value={parcel.length}
-                        onChange={handleParcelChange}
-                        placeholder="0"
-                        className={errors.length ? "input-error" : ""}
-                      />
-
-                      {errors.length && (
-                        <small className="error-text">{errors.length}</small>
-                      )}
-                    </div>
-
-                    <div className="form-group">
-                      <label>Width (cm)</label>
-
-                      <input
-                        type="number"
-                        name="width"
-                        value={parcel.width}
-                        onChange={handleParcelChange}
-                        placeholder="0"
-                        className={errors.width ? "input-error" : ""}
-                      />
-
-                      {errors.width && (
-                        <small className="error-text">{errors.width}</small>
-                      )}
-                    </div>
-
-                    <div className="form-group">
-                      <label>Height (cm)</label>
-
-                      <input
-                        type="number"
-                        name="height"
-                        value={parcel.height}
-                        onChange={handleParcelChange}
-                        placeholder="0"
-                        className={errors.height ? "input-error" : ""}
-                      />
-
-                      {errors.height && (
-                        <small className="error-text">{errors.height}</small>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="form-group full-width">
-                    <label>Shipment Description</label>
-
-                    <textarea
-                      rows="5"
-                      name="description"
-                      value={parcel.description}
-                      onChange={handleParcelChange}
-                      placeholder="Describe the contents..."
-                    />
-                  </div>
+                  {errors.weight && (
+                    <small className="form-error">{errors.weight}</small>
+                  )}
                 </div>
 
-                {/* =====================
-            RIGHT SIDE
-      ===================== */}
+                <div className="form-group">
+                  <label>Declared Value (£)</label>
 
-                <div className="shipment-preview">
-                  <h3>📦 Shipment Preview</h3>
+                  <input
+                    type="number"
+                    min="0"
+                    name="value"
+                    value={parcel.value}
+                    onChange={handleParcelChange}
+                    placeholder="250"
+                    className={errors.value ? "input-error" : ""}
+                  />
 
-                  <div className="preview-item">
-                    <span>Package</span>
+                  {errors.value && (
+                    <small className="form-error">{errors.value}</small>
+                  )}
+                </div>
 
-                    <strong>{parcel.packageType}</strong>
-                  </div>
+                <div className="form-group">
+                  <label>Length (cm)</label>
 
-                  <div className="preview-item">
-                    <span>Weight</span>
+                  <input
+                    type="number"
+                    min="0"
+                    name="length"
+                    value={parcel.length}
+                    onChange={handleParcelChange}
+                    placeholder="30"
+                    className={errors.length ? "input-error" : ""}
+                  />
 
-                    <strong>
-                      <strong>{parcel.weight || "--"} kg</strong>
-                    </strong>
-                  </div>
+                  {errors.length && (
+                    <small className="form-error">{errors.length}</small>
+                  )}
+                </div>
 
-                  <div className="preview-item">
-                    <span>Dimensions</span>
+                <div className="form-group">
+                  <label>Width (cm)</label>
 
-                    <strong>
-                      <strong>
-                        {parcel.length || "--"} × {parcel.width || "--"} ×{" "}
-                        {parcel.height || "--"}
-                      </strong>
-                    </strong>
-                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    name="width"
+                    value={parcel.width}
+                    onChange={handleParcelChange}
+                    placeholder="20"
+                    className={errors.width ? "input-error" : ""}
+                  />
 
-                  <div className="preview-item">
-                    <span>Shipping</span>
+                  {errors.width && (
+                    <small className="form-error">{errors.width}</small>
+                  )}
+                </div>
 
-                    <strong>Not Selected</strong>
-                  </div>
+                <div className="form-group">
+                  <label>Height (cm)</label>
 
-                  <div className="preview-item">
-                    <span>Insurance</span>
+                  <input
+                    type="number"
+                    min="0"
+                    name="height"
+                    value={parcel.height}
+                    onChange={handleParcelChange}
+                    placeholder="15"
+                    className={errors.height ? "input-error" : ""}
+                  />
 
-                    <strong>Included</strong>
-                  </div>
+                  {errors.height && (
+                    <small className="form-error">{errors.height}</small>
+                  )}
+                </div>
 
-                  <div className="preview-divider"></div>
+                <div className="form-group form-group-full">
+                  <label>Parcel Description</label>
 
-                  <div className="preview-total">
-                    <span>Estimated Cost</span>
+                  <textarea
+                    name="description"
+                    value={parcel.description}
+                    onChange={handleParcelChange}
+                    placeholder="Describe the contents of your shipment"
+                    rows="4"
+                  />
+                </div>
 
-                    <h2>£{parcel.value || "0.00"}</h2>
-                  </div>
+                <div className="form-group">
+                  <label>Shipping Method</label>
 
-                  <div className="preview-arrival">
-                    🚚 ETA will appear after shipping method selection.
-                  </div>
+                  <select
+                    name="shippingMethod"
+                    value={parcel.shippingMethod}
+                    onChange={handleParcelChange}
+                  >
+                    <option>Standard Delivery</option>
+                    <option>Express Delivery</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Insurance</label>
+
+                  <select
+                    name="insurance"
+                    value={parcel.insurance}
+                    onChange={handleParcelChange}
+                  >
+                    <option>No Insurance</option>
+                    <option>Basic Insurance</option>
+                    <option>Premium Insurance</option>
+                  </select>
                 </div>
               </div>
             </>
           )}
+          {/* =====================================
+              STEP 4 — REVIEW
+          ===================================== */}
 
           {currentStep === 4 && (
             <>
-              {bookingComplete ? (
-                <div className="booking-success-card">
-                  <div className="success-icon">✓</div>
+              <div className="booking-card-header">
+                <h2>Review Shipment</h2>
 
-                  <span className="success-badge">Shipment Confirmed</span>
+                <p>
+                  Review your shipment details before proceeding to payment.
+                </p>
+              </div>
 
-                  <h2>Booking Completed Successfully</h2>
+              <div className="booking-review">
+                {/* SENDER */}
 
-                  <p className="success-text">
-                    Your shipment has been successfully booked. A tracking ID
-                    has been generated and your shipment is now awaiting pickup.
-                  </p>
+                <div className="review-section">
+                  <div className="review-section-heading">
+                    <span>01</span>
 
-                  <div className="success-grid">
-                    <div className="success-item">
-                      <span>Tracking Number</span>
-                      <strong>
-                        LT-{Math.floor(Math.random() * 900000000 + 100000000)}
-                      </strong>
-                    </div>
-
-                    <div className="success-item">
-                      <span>Status</span>
-                      <strong className="green">Confirmed</strong>
-                    </div>
-
-                    <div className="success-item">
-                      <span>Estimated Delivery</span>
-                      <strong>3–5 Business Days</strong>
-                    </div>
-
-                    <div className="success-item">
-                      <span>Insurance</span>
-                      <strong>Included</strong>
+                    <div>
+                      <small>SENDER</small>
+                      <h3>{sender.fullName}</h3>
                     </div>
                   </div>
 
-                  <div className="shipment-summary">
-                    <h3>Shipment Summary</h3>
+                  <div className="review-details">
+                    <p>{sender.email}</p>
+                    <p>{sender.phone}</p>
+                    <p>{sender.address}</p>
+                    <p>
+                      {sender.city}, {sender.state}, {sender.country}{" "}
+                      {sender.postalCode}
+                    </p>
+                  </div>
+                </div>
 
-                    <div className="summary-row">
-                      <span>Package</span>
-                      <strong>{parcel.packageType}</strong>
+                {/* RECEIVER */}
+
+                <div className="review-section">
+                  <div className="review-section-heading">
+                    <span>02</span>
+
+                    <div>
+                      <small>RECEIVER</small>
+                      <h3>{receiver.fullName}</h3>
                     </div>
+                  </div>
 
-                    <div className="summary-row">
+                  <div className="review-details">
+                    <p>{receiver.email}</p>
+                    <p>{receiver.phone}</p>
+                    <p>{receiver.address}</p>
+                    <p>
+                      {receiver.city}, {receiver.state}, {receiver.country}{" "}
+                      {receiver.postalCode}
+                    </p>
+                  </div>
+                </div>
+
+                {/* PARCEL */}
+
+                <div className="review-section">
+                  <div className="review-section-heading">
+                    <span>03</span>
+
+                    <div>
+                      <small>PARCEL</small>
+                      <h3>{parcel.packageType}</h3>
+                    </div>
+                  </div>
+
+                  <div className="review-details review-parcel-grid">
+                    <div>
                       <span>Weight</span>
                       <strong>{parcel.weight} kg</strong>
                     </div>
 
-                    <div className="summary-row">
+                    <div>
                       <span>Dimensions</span>
+
                       <strong>
                         {parcel.length} × {parcel.width} × {parcel.height} cm
                       </strong>
                     </div>
 
-                    <div className="summary-row">
+                    <div>
                       <span>Declared Value</span>
-                      <strong>£ {parcel.value}</strong>
+
+                      <strong>£{Number(parcel.value || 0).toFixed(2)}</strong>
                     </div>
-                  </div>
 
-                  <div className="success-buttons">
-                    <button className="primary-success-btn">
-                      Track Shipment →
-                    </button>
+                    <div>
+                      <span>Shipping Method</span>
 
-                    <button
-                      className="secondary-success-btn"
-                      onClick={() => window.print()}
-                    >
-                      Download Receipt
-                    </button>
+                      <strong>{parcel.shippingMethod}</strong>
+                    </div>
 
-                    <button
-                      className="ghost-success-btn"
-                      onClick={() => {
-                        setCurrentStep(1);
+                    <div>
+                      <span>Insurance</span>
 
-                        setBookingComplete(false);
+                      <strong>{parcel.insurance}</strong>
+                    </div>
 
-                        setSender({
-                          fullName: "",
-                          email: "",
-                          phone: "",
-                          country: "",
-                          address: "",
-                        });
+                    <div>
+                      <span>Description</span>
 
-                        setReceiver({
-                          fullName: "",
-                          email: "",
-                          phone: "",
-                          country: "",
-                          state: "",
-                          city: "",
-                          postalCode: "",
-                          address: "",
-                        });
-
-                        setParcel({
-                          packageType: "Standard Box",
-                          weight: "",
-                          value: "",
-                          length: "",
-                          width: "",
-                          height: "",
-                          description: "",
-                        });
-                      }}
-                    >
-                      Book Another Shipment
-                    </button>
+                      <strong>
+                        {parcel.description || "No description provided"}
+                      </strong>
+                    </div>
                   </div>
                 </div>
-              ) : creatingShipment ? (
-                <div className="booking-loading">
-                  <div className="loader-circle"></div>
 
-                  <h2>Creating Shipment...</h2>
+                {/* PRICE BREAKDOWN */}
 
-                  <p>Generating Tracking Number</p>
-                </div>
-              ) : (
-                <div className="review-card">
-                  <div className="review-header">
-                    <h2>Shipment Review</h2>
-                    <p>
-                      Please review every detail before confirming your
-                      shipment.
-                    </p>
+                <div className="review-total-card">
+                  <div>
+                    <span>Shipping</span>
+                    <strong>£{shippingPrice.toFixed(2)}</strong>
                   </div>
 
-                  <div className="review-grid">
-                    {/* Sender */}
-
-                    <div className="review-section">
-                      <h3>👤 Sender</h3>
-
-                      <div className="review-item">
-                        <span>Name</span>
-                        <strong>{sender.fullName}</strong>
-                      </div>
-
-                      <div className="review-item">
-                        <span>Email</span>
-                        <strong>{sender.email}</strong>
-                      </div>
-
-                      <div className="review-item">
-                        <span>Phone</span>
-                        <strong>{sender.phone}</strong>
-                      </div>
-
-                      <div className="review-item">
-                        <span>Country</span>
-                        <strong>{sender.country}</strong>
-                      </div>
-
-                      <div className="review-item">
-                        <span>Address</span>
-                        <strong>{sender.address}</strong>
-                      </div>
-                    </div>
-
-                    {/* Receiver */}
-
-                    <div className="review-section">
-                      <h3>📍 Receiver</h3>
-
-                      <div className="review-item">
-                        <span>Name</span>
-                        <strong>{receiver.fullName}</strong>
-                      </div>
-
-                      <div className="review-item">
-                        <span>Email</span>
-                        <strong>{receiver.email}</strong>
-                      </div>
-
-                      <div className="review-item">
-                        <span>Phone</span>
-                        <strong>{receiver.phone}</strong>
-                      </div>
-
-                      <div className="review-item">
-                        <span>Country</span>
-                        <strong>{receiver.country}</strong>
-                      </div>
-
-                      <div className="review-item">
-                        <span>Address</span>
-                        <strong>{receiver.address}</strong>
-                      </div>
-                    </div>
-
-                    {/* Parcel */}
-
-                    <div className="review-section full-width">
-                      <h3>📦 Parcel Details</h3>
-
-                      <div className="parcel-review-grid">
-                        <div className="review-item">
-                          <span>Package</span>
-                          <strong>{parcel.packageType}</strong>
-                        </div>
-
-                        <div className="review-item">
-                          <span>Weight</span>
-                          <strong>{parcel.weight} kg</strong>
-                        </div>
-
-                        <div className="review-item">
-                          <span>Dimensions</span>
-                          <strong>
-                            {parcel.length} × {parcel.width} × {parcel.height}
-                          </strong>
-                        </div>
-
-                        <div className="review-item">
-                          <span>Shipping</span>
-                          <strong>{parcel.shippingMethod}</strong>
-                        </div>
-
-                        <div className="review-item">
-                          <span>Insurance</span>
-                          <strong>
-                            {parcel.insurance ? "Included" : "Not Included"}
-                          </strong>
-                        </div>
-
-                        <div className="review-item">
-                          <span>Declared Value</span>
-                          <strong>£{parcel.value}</strong>
-                        </div>
-                      </div>
-                    </div>
+                  <div>
+                    <span>Insurance</span>
+                    <strong>£{insurancePrice.toFixed(2)}</strong>
                   </div>
 
-                  <div className="booking-actions">
-                    <button className="secondary-btn">Save Draft</button>
+                  <div>
+                    <span>Service Fee</span>
+                    <strong>£{serviceFee.toFixed(2)}</strong>
+                  </div>
 
-                    <button
-                      type="button"
-                      className="primary-btn"
-                      onClick={async () => {
-                        setIsBooking(true);
-
-                        await new Promise((resolve) =>
-                          setTimeout(resolve, 1800),
-                        );
-
-                        setIsBooking(false);
-
-                        setBookingComplete(true);
-                      }}
-                      disabled={isBooking}
-                    >
-                      {isBooking && <span className="btn-spinner"></span>}
-                      {isBooking ? "Booking Shipment..." : "Confirm Booking"}
-                    </button>
+                  <div className="review-total">
+                    <span>Total</span>
+                    <strong>£{total.toFixed(2)}</strong>
                   </div>
                 </div>
-              )}
+              </div>
             </>
           )}
 
-          {/* ===========================
-        BUTTONS
-  =========================== */}
+          {/* =====================================
+              STEP 5 — PAYMENT
+          ===================================== */}
 
-          <div className="booking-actions">
-            {currentStep > 1 && (
-              <button
-                type="button"
-                className="back-btn"
-                onClick={() => setCurrentStep(currentStep - 1)}
-              >
-                ← Back
-              </button>
-            )}
+          {currentStep === 5 && (
+            <>
+              <div className="booking-card-header">
+                <h2>Payment</h2>
 
-            {currentStep < 4 && (
-              <button
-                type="button"
-                className="next-btn"
-                onClick={() => {
-                  if (validateStep()) {
-                    setCurrentStep(currentStep + 1);
-                  }
-                }}
-              >
-                Continue →
-              </button>
-            )}
-          </div>
+                <p>Choose how you'd like to pay for this shipment.</p>
+              </div>
+
+              <div className="payment-layout">
+                {/* PAYMENT METHOD */}
+
+                <div className="payment-method-panel">
+                  <span className="payment-label">DEFAULT PAYMENT METHOD</span>
+
+                  <div className="payment-method-card active">
+                    <div className="payment-card-icon">💳</div>
+
+                    <div className="payment-card-info">
+                      <strong>
+                        {payment.method} •••• {payment.lastFour}
+                      </strong>
+
+                      <span>{payment.cardholder}</span>
+
+                      <small>Default payment method</small>
+                    </div>
+
+                    <div className="payment-check">✓</div>
+                  </div>
+
+                  <button type="button" className="payment-change-button">
+                    Change payment method
+                  </button>
+
+                  <div className="payment-secure-note">
+                    <span>🔒</span>
+
+                    <p>
+                      Your payment information is securely handled. No card
+                      details are stored in this demo.
+                    </p>
+                  </div>
+                </div>
+
+                {/* PAYMENT SUMMARY */}
+
+                <div className="payment-summary-card">
+                  <span className="payment-label">PAYMENT SUMMARY</span>
+
+                  <div className="payment-summary-row">
+                    <span>Shipment</span>
+
+                    <strong>£{shippingPrice.toFixed(2)}</strong>
+                  </div>
+
+                  <div className="payment-summary-row">
+                    <span>Insurance</span>
+
+                    <strong>£{insurancePrice.toFixed(2)}</strong>
+                  </div>
+
+                  <div className="payment-summary-row">
+                    <span>Service fee</span>
+
+                    <strong>£{serviceFee.toFixed(2)}</strong>
+                  </div>
+
+                  <div className="payment-summary-divider" />
+
+                  <div className="payment-summary-total">
+                    <span>Total</span>
+
+                    <strong>£{total.toFixed(2)}</strong>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="booking-confirm-payment"
+                    onClick={handleConfirmPayment}
+                    disabled={creatingShipment}
+                  >
+                    {creatingShipment ? (
+                      <>
+                        <span className="payment-spinner" />
+                        Processing Payment...
+                      </>
+                    ) : (
+                      <>Confirm & Pay £{total.toFixed(2)}</>
+                    )}
+                  </button>
+
+                  <p className="payment-demo-note">
+                    Demo payment — no real charge will be made.
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* =====================================
+              NAVIGATION
+          ===================================== */}
+
+          {!creatingShipment && (
+            <div className="booking-navigation">
+              {currentStep > 1 ? (
+                <button
+                  type="button"
+                  className="booking-back-button"
+                  onClick={goBack}
+                >
+                  ← Back
+                </button>
+              ) : (
+                <span />
+              )}
+
+              {currentStep < 5 && (
+                <button
+                  type="button"
+                  className="booking-next-button"
+                  onClick={goNext}
+                >
+                  {currentStep === 4 ? "Continue to Payment →" : "Continue →"}
+                </button>
+              )}
+            </div>
+          )}
         </form>
-      </div>
+      </main>
     </DashboardLayout>
   );
 };

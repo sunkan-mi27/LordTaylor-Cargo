@@ -194,10 +194,10 @@ const ShippingCalculator = () => {
               <div className="estimate-progress-fill"></div>
             </div>
 
-            <button className="estimate-btn">
-              Get Instant Quote
+            <div className="estimate-btn">
+              Your Satisfaction
               <FaArrowRight />
-            </button>
+            </div>
             <motion.div
               className="assistant-card"
               initial={{ opacity: 0, y: 40 }}

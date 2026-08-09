@@ -9,45 +9,35 @@ import {
   FaClock,
 } from "react-icons/fa6";
 
-const shipments = [
-  {
-    id: "LT-24081",
-    destination: "Lagos, Nigeria",
-    status: "In Transit",
-    eta: "12 Aug 2026",
-    icon: <FaTruck />,
-    color: "#3b82f6",
-  },
+import shipments from "../../data/shipments";
 
-  {
-    id: "LT-24073",
-    destination: "Abuja, Nigeria",
-    status: "Delivered",
-    eta: "Completed",
-    icon: <FaCircleCheck />,
-    color: "#22c55e",
-  },
+const getShipmentIcon = (statusType) => {
+  if (statusType === "delivered") {
+    return FaCircleCheck;
+  }
 
-  {
-    id: "LT-24069",
-    destination: "Port Harcourt",
-    status: "Processing",
-    eta: "15 Aug 2026",
-    icon: <FaClock />,
-    color: "#f59e0b",
-  },
+  if (statusType === "transit") {
+    return FaTruck;
+  }
 
-  {
-    id: "LT-24058",
-    destination: "Ibadan",
-    status: "Booked",
-    eta: "Awaiting Dispatch",
-    icon: <FaBox />,
-    color: "#8b5cf6",
-  },
-];
+  return FaBox;
+};
+
+const getShipmentColor = (statusType) => {
+  if (statusType === "delivered") {
+    return "#22c55e";
+  }
+
+  if (statusType === "transit") {
+    return "#3b82f6";
+  }
+
+  return "#f59e0b";
+};
 
 const RecentShipments = () => {
+  const recentShipments = shipments.slice(0, 4);
+
   return (
     <section className="recent-shipments">
       <div className="section-heading">
@@ -64,48 +54,54 @@ const RecentShipments = () => {
       </div>
 
       <div className="shipment-list">
-        {shipments.map((shipment) => (
-          <motion.div
-            key={shipment.id}
-            className="shipment-card"
-            whileHover={{
-              y: -4,
-            }}
-            transition={{
-              duration: 0.2,
-            }}
-          >
-            <div
-              className="shipment-icon"
-              style={{
-                background: `${shipment.color}18`,
-                color: shipment.color,
+        {recentShipments.map((shipment) => {
+          const Icon = getShipmentIcon(shipment.statusType);
+
+          const color = getShipmentColor(shipment.statusType);
+
+          return (
+            <motion.div
+              key={shipment.id}
+              className="shipment-card"
+              whileHover={{
+                y: -4,
+              }}
+              transition={{
+                duration: 0.2,
               }}
             >
-              {shipment.icon}
-            </div>
-
-            <div className="shipment-info">
-              <h3>{shipment.id}</h3>
-
-              <p>{shipment.destination}</p>
-            </div>
-
-            <div className="shipment-status">
-              <span
-                className="status-badge"
+              <div
+                className="shipment-icon"
                 style={{
-                  background: `${shipment.color}18`,
-                  color: shipment.color,
+                  background: `${color}18`,
+                  color,
                 }}
               >
-                {shipment.status}
-              </span>
+                <Icon />
+              </div>
 
-              <small>{shipment.eta}</small>
-            </div>
-          </motion.div>
-        ))}
+              <div className="shipment-info">
+                <h3>{shipment.trackingNumber}</h3>
+
+                <p>{shipment.destination}</p>
+              </div>
+
+              <div className="shipment-status">
+                <span
+                  className="status-badge"
+                  style={{
+                    background: `${color}18`,
+                    color,
+                  }}
+                >
+                  {shipment.status}
+                </span>
+
+                <small>{shipment.estimatedDelivery}</small>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );

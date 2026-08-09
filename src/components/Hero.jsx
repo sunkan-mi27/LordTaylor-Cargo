@@ -113,27 +113,6 @@ const Hero = () => {
             customer experience.
           </p>
 
-          <div className="hero-buttons">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.96 }}
-              className="primary-btn"
-              onClick={() => navigate("/track")}
-            >
-              Track Shipment
-              <FaArrowRight />
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="secondary-btn"
-              onClick={() => navigate("/quote")}
-            >
-              Get Quote
-            </motion.button>
-          </div>
-
           <div className="hero-highlights">
             <div className="highlight">
               <FaHeadset />

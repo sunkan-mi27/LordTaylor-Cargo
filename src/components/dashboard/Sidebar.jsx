@@ -29,11 +29,6 @@ const Sidebar = () => {
       path: "/track",
     },
     {
-      title: "Quotes",
-      icon: <FaFileInvoiceDollar />,
-      path: "/quote",
-    },
-    {
       title: "History",
       icon: <FaClockRotateLeft />,
       path: "/history",
