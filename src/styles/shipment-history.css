@@ -956,6 +956,22 @@
   overflow: hidden !important;
 }
 
+.shipment-card .tracking-label {
+  color: rgba(255, 255, 255, 0.55);
+}
+.shipment-card .route-point span {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+.shipment-card .route-point strong {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.shipment-card .info-box small {
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+.shipment-card .info-box strong {
+  color: rgba(255, 255, 255, 0.68) !important;
+}
 /* TOP */
 
 .shipment-top {

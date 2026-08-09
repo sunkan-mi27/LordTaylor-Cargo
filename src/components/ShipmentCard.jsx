@@ -6,7 +6,7 @@ export default function ShipmentCard({ shipment, onView }) {
       {/* TOP */}
       <div className="shipment-top">
         <div className="shipment-id">
-          <small>Tracking Number</small>
+          <span className="tracking-label">Tracking Number</span>
           <h3>{shipment.id}</h3>
         </div>
 

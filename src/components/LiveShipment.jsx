@@ -218,7 +218,7 @@ const LiveShipment = () => {
             </div>
 
             <div className="mission-footer">
-              <motion.button
+              <div
                 whileHover={{
                   scale: 1.03,
                 }}
@@ -227,9 +227,8 @@ const LiveShipment = () => {
                 }}
                 className="track-button"
               >
-                Track Shipment
-                <FaArrowRight />
-              </motion.button>
+                Track Shipment With Ease
+              </div>
             </div>
           </motion.div>
           <motion.div

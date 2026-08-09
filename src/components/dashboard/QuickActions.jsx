@@ -29,19 +29,10 @@ const actions = [
   },
 
   {
-    id: 3,
-    title: "Generate Quote",
-    description: "Calculate shipping costs before booking your shipment.",
-    icon: <FaFileInvoiceDollar />,
-    link: "/quote",
-    color: "#f59e0b",
-  },
-
-  {
     id: 4,
     title: "Shipment History",
     description: "Review previous shipments and delivery records.",
-    link: "#",
+    link: "/history",
     icon: <FaClockRotateLeft />,
     color: "#8b5cf6",
   },
