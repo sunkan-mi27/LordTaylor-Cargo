@@ -4,15 +4,22 @@ import { Link } from "react-router-dom";
 import { FaCircleCheck, FaUser, FaGear, FaArrowRight } from "react-icons/fa6";
 
 const AccountSnapshot = () => {
-  const account = {
-    firstName: "Sunkanmi",
-    lastName: "Ibrahim",
-    tier: "Standard",
-    region: "Nigeria",
-    verification: "Verified",
-  };
+  const storedUser =
+    localStorage.getItem("lordtaylor-user") ||
+    sessionStorage.getItem("lordtaylor-user");
 
-  const initials = `${account.firstName.charAt(0)}${account.lastName.charAt(0)}`;
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
+  const firstName = user?.firstName || user?.name?.split(" ")[0] || "Customer";
+
+  const lastName =
+    user?.lastName || user?.name?.split(" ").slice(1).join(" ") || "";
+
+  const tier = user?.tier || "Standard";
+  const region = user?.region || "Nigeria";
+  const verification = user?.verification || "Verified";
+
+  const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 
   return (
     <motion.section
@@ -37,7 +44,7 @@ const AccountSnapshot = () => {
 
         <div className="account-user">
           <h3>
-            {account.firstName} {account.lastName}
+            {firstName} {lastName}
           </h3>
 
           <p>Customer Account</p>
@@ -50,21 +57,20 @@ const AccountSnapshot = () => {
 
           <strong>
             <FaCircleCheck />
-
-            {account.verification}
+            {verification}
           </strong>
         </div>
 
         <div className="account-status-row">
           <span>Membership</span>
 
-          <strong>{account.tier}</strong>
+          <strong>{tier}</strong>
         </div>
 
         <div className="account-status-row">
           <span>Region</span>
 
-          <strong>{account.region}</strong>
+          <strong>{region}</strong>
         </div>
       </div>
 

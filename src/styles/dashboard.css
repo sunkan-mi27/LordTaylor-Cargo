@@ -225,12 +225,22 @@
   margin-bottom: 18px;
 }
 
-.status-indicator {
+.dashboard-status-indicator {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
+
+  width: 100%;
+  min-width: 0;
+
   color: #cbd5e1;
   line-height: 1.6;
+}
+
+.status-message {
+  flex: 1;
+  min-width: 0;
+  color: #cbd5e1;
 }
 
 .live-dot {

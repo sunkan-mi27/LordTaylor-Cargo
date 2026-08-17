@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import "../styles/profile.css";
+
+const API_URL = "http://localhost:5000/api";
 
 export default function Profile() {
   /* =========================================
@@ -12,16 +14,22 @@ export default function Profile() {
   const [saved, setSaved] = useState(false);
 
   const [profile, setProfile] = useState({
-    firstName: "Sunkanmi",
-    lastName: "Ibrahim",
-    email: "sunkanmi@example.com",
-    phone: "+234 800 000 0000",
-    customerId: "LT-CUS-20481",
-    memberSince: "2026",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    customerId: "",
+    memberSince: "",
     accountTier: "Standard",
+    country: "",
+    city: "",
+    avatarUrl: "",
   });
 
   const [draft, setDraft] = useState(profile);
+
+  const [loading, setLoading] = useState(true);
+  const [profileError, setProfileError] = useState("");
 
   /* =========================================
      SHIPPING INFORMATION
@@ -30,16 +38,93 @@ export default function Profile() {
   const [shippingEditing, setShippingEditing] = useState(false);
 
   const [shipping, setShipping] = useState({
-    addressLine: "14 Admiralty Way",
-    country: "Nigeria",
-    state: "Lagos",
-    city: "Lekki",
-    postalCode: "101233",
+    addressLine: "",
+    country: "",
+    state: "",
+    city: "",
+    postalCode: "",
     addressType: "Residential",
     deliveryPreference: "Standard Delivery",
   });
 
   const [shippingDraft, setShippingDraft] = useState(shipping);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        setProfileError("");
+
+        const token =
+          localStorage.getItem("lordtaylor-token") ||
+          sessionStorage.getItem("lordtaylor-token");
+
+        if (!token) {
+          setProfileError("Your session has expired. Please sign in again.");
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/profile/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Unable to load your profile");
+        }
+
+        const user = data.user;
+        const userProfile = user.profile || {};
+
+        setShipping({
+          addressLine: userProfile.addressLine || "",
+          country: userProfile.country || "",
+          state: userProfile.state || "",
+          city: userProfile.city || "",
+          postalCode: userProfile.postalCode || "",
+          addressType: userProfile.addressType || "Residential",
+          deliveryPreference:
+            userProfile.deliveryPreference || "Standard Delivery",
+        });
+
+        const realProfile = {
+          firstName: userProfile.firstName || "",
+          lastName: userProfile.lastName || "",
+          email: user.email || "",
+          phone: userProfile.phone || "",
+          customerId: user.id || "",
+          memberSince: user.createdAt
+            ? new Date(user.createdAt).getFullYear().toString()
+            : "",
+          accountTier: "Standard",
+          country: userProfile.country || "",
+          city: userProfile.city || "",
+          avatarUrl: userProfile.avatarUrl || "",
+        };
+
+        setProfile(realProfile);
+        setDraft(realProfile);
+
+        // Keep the latest user information available to the app
+        const storage = localStorage.getItem("lordtaylor-token")
+          ? localStorage
+          : sessionStorage;
+
+        storage.setItem("lordtaylor-user", JSON.stringify(user));
+      } catch (error) {
+        console.error("Profile loading error:", error);
+        setProfileError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   /* =========================================
      PERSONAL HANDLERS
@@ -67,14 +152,68 @@ export default function Profile() {
     setSaved(false);
   };
 
-  const handleSave = () => {
-    setProfile(draft);
-    setEditing(false);
-    setSaved(true);
-
-    window.setTimeout(() => {
+  const handleSave = async () => {
+    try {
       setSaved(false);
-    }, 3000);
+
+      const token =
+        localStorage.getItem("lordtaylor-token") ||
+        sessionStorage.getItem("lordtaylor-token");
+
+      if (!token) {
+        throw new Error("Your session has expired. Please sign in again.");
+      }
+
+      const response = await fetch(`${API_URL}/profile/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firstName: draft.firstName,
+          lastName: draft.lastName,
+          phone: draft.phone,
+          country: draft.country,
+          city: draft.city,
+          avatarUrl: draft.avatarUrl,
+
+          addressLine: shippingDraft.addressLine,
+          state: shippingDraft.state,
+          postalCode: shippingDraft.postalCode,
+          addressType: shippingDraft.addressType,
+          deliveryPreference: shippingDraft.deliveryPreference,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to update your profile");
+      }
+
+      const updatedProfile = {
+        ...profile,
+        firstName: data.profile.firstName || "",
+        lastName: data.profile.lastName || "",
+        phone: data.profile.phone || "",
+        country: data.profile.country || "",
+        city: data.profile.city || "",
+        avatarUrl: data.profile.avatarUrl || "",
+      };
+
+      setProfile(updatedProfile);
+      setDraft(updatedProfile);
+      setEditing(false);
+      setSaved(true);
+
+      window.setTimeout(() => {
+        setSaved(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Profile update error:", error);
+      setProfileError(error.message);
+    }
   };
 
   /* =========================================
@@ -100,9 +239,86 @@ export default function Profile() {
     setShippingEditing(false);
   };
 
-  const handleShippingSave = () => {
-    setShipping(shippingDraft);
-    setShippingEditing(false);
+  const handleShippingSave = async () => {
+    try {
+      setProfileError("");
+
+      const token =
+        localStorage.getItem("lordtaylor-token") ||
+        sessionStorage.getItem("lordtaylor-token");
+
+      if (!token) {
+        throw new Error("Your session has expired. Please sign in again.");
+      }
+
+      const response = await fetch(`${API_URL}/profile/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          phone: profile.phone,
+          country: shippingDraft.country,
+          city: shippingDraft.city,
+          avatarUrl: profile.avatarUrl,
+
+          addressLine: shippingDraft.addressLine,
+          state: shippingDraft.state,
+          postalCode: shippingDraft.postalCode,
+          addressType: shippingDraft.addressType,
+          deliveryPreference: shippingDraft.deliveryPreference,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to update your shipping information",
+        );
+      }
+
+      setShipping({
+        addressLine: data.profile.addressLine || "",
+        country: data.profile.country || "",
+        state: data.profile.state || "",
+        city: data.profile.city || "",
+        postalCode: data.profile.postalCode || "",
+        addressType: data.profile.addressType || "Residential",
+        deliveryPreference:
+          data.profile.deliveryPreference || "Standard Delivery",
+      });
+
+      setShippingDraft({
+        addressLine: data.profile.addressLine || "",
+        country: data.profile.country || "",
+        state: data.profile.state || "",
+        city: data.profile.city || "",
+        postalCode: data.profile.postalCode || "",
+        addressType: data.profile.addressType || "Residential",
+        deliveryPreference:
+          data.profile.deliveryPreference || "Standard Delivery",
+      });
+
+      setProfile((previous) => ({
+        ...previous,
+        country: data.profile.country || "",
+        city: data.profile.city || "",
+      }));
+
+      setShippingEditing(false);
+      setSaved(true);
+
+      window.setTimeout(() => {
+        setSaved(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Shipping update error:", error);
+      setProfileError(error.message);
+    }
   };
 
   /* =========================================
@@ -118,6 +334,18 @@ export default function Profile() {
   /* =========================================
      PAGE
   ========================================= */
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <main className="profile-page">
+          {profileError && <div className="profile-error">{profileError}</div>}
+
+          <div className="profile-loading">Loading your profile...</div>
+        </main>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

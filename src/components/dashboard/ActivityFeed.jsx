@@ -1,43 +1,46 @@
 import { motion } from "framer-motion";
 import { FaCircleCheck, FaShip, FaBoxOpen } from "react-icons/fa6";
 
-import shipments from "../../data/shipments";
+const getActivityIcon = (title) => {
+  const normalized = title.toLowerCase();
 
-const getActivityIcon = (shipment) => {
-  if (shipment.statusType === "delivered") {
+  if (normalized.includes("delivered")) {
     return FaCircleCheck;
   }
 
-  if (shipment.statusType === "transit") {
+  if (normalized.includes("transit")) {
     return FaShip;
   }
 
   return FaBoxOpen;
 };
 
-const getActivityColor = (shipment) => {
-  if (shipment.statusType === "delivered") {
+const getActivityColor = (title) => {
+  const normalized = title.toLowerCase();
+
+  if (normalized.includes("delivered")) {
     return "#22c55e";
   }
 
-  if (shipment.statusType === "transit") {
+  if (normalized.includes("transit")) {
     return "#3b82f6";
   }
 
   return "#f59e0b";
 };
 
-const ActivityFeed = () => {
-  const activities = shipments.slice(0, 4).map((shipment) => ({
-    id: shipment.id,
-    shipment,
-    title:
-      shipment.statusType === "delivered"
-        ? `Shipment ${shipment.trackingNumber} successfully delivered`
-        : `${shipment.trackingNumber} is currently in transit`,
-    time: shipment.lastUpdate,
-  }));
+const formatActivityTime = (date) => {
+  if (!date) return "";
 
+  return new Date(date).toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const ActivityFeed = ({ activities = [], loading }) => {
   return (
     <section className="activity-feed">
       <div className="section-heading">
@@ -49,48 +52,54 @@ const ActivityFeed = () => {
       </div>
 
       <div className="activity-list">
-        {activities.map((activity, index) => {
-          const Icon = getActivityIcon(activity.shipment);
-          const color = getActivityColor(activity.shipment);
+        {loading ? (
+          <div className="activity-loading">Loading latest activity...</div>
+        ) : activities.length === 0 ? (
+          <div className="activity-loading">No recent activity.</div>
+        ) : (
+          activities.slice(0, 6).map((activity, index) => {
+            const Icon = getActivityIcon(activity.title);
+            const color = getActivityColor(activity.title);
 
-          return (
-            <motion.div
-              key={activity.id}
-              className="activity-item"
-              initial={{
-                opacity: 0,
-                x: -20,
-              }}
-              whileInView={{
-                opacity: 1,
-                x: 0,
-              }}
-              viewport={{
-                once: true,
-              }}
-              transition={{
-                delay: index * 0.08,
-                duration: 0.35,
-              }}
-            >
-              <div
-                className="activity-icon"
-                style={{
-                  background: `${color}18`,
-                  color,
+            return (
+              <motion.div
+                key={activity.id}
+                className="activity-item"
+                initial={{
+                  opacity: 0,
+                  x: -20,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  x: 0,
+                }}
+                viewport={{
+                  once: true,
+                }}
+                transition={{
+                  delay: index * 0.08,
+                  duration: 0.35,
                 }}
               >
-                <Icon />
-              </div>
+                <div
+                  className="activity-icon"
+                  style={{
+                    background: `${color}18`,
+                    color,
+                  }}
+                >
+                  <Icon />
+                </div>
 
-              <div className="activity-content">
-                <h4>{activity.title}</h4>
+                <div className="activity-content">
+                  <h4>{activity.title}</h4>
 
-                <span>{activity.time}</span>
-              </div>
-            </motion.div>
-          );
-        })}
+                  <span>{formatActivityTime(activity.eventDate)}</span>
+                </div>
+              </motion.div>
+            );
+          })
+        )}
       </div>
     </section>
   );

@@ -27,18 +27,67 @@ const Register = () => {
     confirmPassword: "",
   });
 
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setForm((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+
+    setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Backend Integration Later
-    navigate("/home");
+    setError("");
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          phone: form.phone,
+          password: form.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || "Unable to create account.");
+        return;
+      }
+
+      // Store the JWT returned by the backend
+      localStorage.setItem("lordtaylor-token", data.token);
+
+      // Keep the existing auth flag for the current frontend flow
+      localStorage.setItem("lordtaylor-auth", "true");
+
+      navigate("/portal-loading");
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError(
+        "Unable to connect to the server. Please make sure the backend is running.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,6 +108,8 @@ const Register = () => {
           Join LordTaylor Cargo and manage all your shipments from one secure
           dashboard.
         </p>
+
+        {error && <div className="auth-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="register-grid">
@@ -188,12 +239,13 @@ const Register = () => {
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: loading ? 1 : 1.02 }}
+            whileTap={{ scale: loading ? 1 : 0.98 }}
             className="register-btn"
             type="submit"
+            disabled={loading}
           >
-            Create Account
+            {loading ? "Creating Account..." : "Create Account"}
           </motion.button>
         </form>
 

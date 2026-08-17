@@ -53,9 +53,12 @@ const DashboardHero = ({
 
           <h3>Operational</h3>
 
-          <div className="status-indicator">
+          <div className="dashboard-status-indicator">
             <span className="live-dot"></span>
-            All logistics services are running normally.
+
+            <span className="status-message">
+              All logistics services are running normally.
+            </span>
           </div>
         </div>
       </div>

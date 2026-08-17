@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaShip, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import "../styles/login.css";
 
+const API_URL = "http://localhost:5000/api";
+
 const Login = () => {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     email: "",
@@ -22,19 +26,45 @@ const Login = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    if (error) setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Temporary Authentication
-    if (form.remember) {
-      localStorage.setItem("lordtaylor-auth", "true");
-    } else {
-      sessionStorage.setItem("lordtaylor-auth", "true");
-    }
+    setError("");
+    setLoading(true);
 
-    navigate("/portal-loading");
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to sign in");
+      }
+
+      const storage = form.remember ? localStorage : sessionStorage;
+
+      storage.setItem("lordtaylor-token", data.token);
+      storage.setItem("lordtaylor-user", JSON.stringify(data.user));
+
+      navigate("/portal-loading");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,6 +83,8 @@ const Login = () => {
 
         <p>Sign in to access your shipment dashboard.</p>
 
+        {error && <div className="login-error">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="login-field">
             <label>Email Address</label>
@@ -66,6 +98,7 @@ const Login = () => {
                 placeholder="john@email.com"
                 value={form.email}
                 onChange={handleChange}
+                autoComplete="email"
                 required
               />
             </div>
@@ -112,12 +145,13 @@ const Login = () => {
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: loading ? 1 : 1.02 }}
+            whileTap={{ scale: loading ? 1 : 0.98 }}
             type="submit"
             className="login-btn"
+            disabled={loading}
           >
-            Sign In
+            {loading ? "Signing In..." : "Sign In"}
           </motion.button>
         </form>
 

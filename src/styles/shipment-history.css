@@ -1310,3 +1310,167 @@
 
   box-shadow: 0 14px 30px rgba(25, 201, 102, 0.25);
 }
+/* ===============================
+   DRAWER INFO — CLEAN LAYOUT
+================================ */
+
+.drawer-row {
+  display: grid;
+  grid-template-columns: 95px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+
+  padding: 16px 18px;
+  min-height: 56px;
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.drawer-row span {
+  color: #718096;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.drawer-row strong {
+  color: #f1f5f9;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ===============================
+   TIMELINE HEADER
+================================ */
+
+.timeline-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+
+  margin-bottom: 18px;
+}
+
+.timeline-heading h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.timeline-heading span {
+  color: #22c55e;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ===============================
+   TIMELINE ITEM
+================================ */
+
+.timeline-item {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  padding: 16px 18px;
+
+  margin-bottom: 10px;
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+
+  color: #64748b;
+
+  font-weight: 500;
+}
+
+.timeline-icon {
+  width: 26px;
+  height: 26px;
+
+  flex: 0 0 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  font-size: 12px;
+}
+
+.timeline-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.timeline-content strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: inherit;
+
+  font-size: 0.86rem;
+}
+
+/* COMPLETED */
+
+.timeline-item.complete {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.055);
+  border-color: rgba(34, 197, 94, 0.1);
+}
+
+.timeline-item.complete .timeline-icon {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+}
+
+/* ACTIVE */
+
+.timeline-item.active {
+  color: #fbbf24;
+
+  background: rgba(251, 191, 36, 0.055);
+  border-color: rgba(251, 191, 36, 0.12);
+}
+
+.timeline-item.active .timeline-icon {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+}
+
+/* ===============================
+   MOBILE DRAWER
+================================ */
+
+@media (max-width: 768px) {
+  .drawer-row {
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .drawer-row strong {
+    text-align: right;
+  }
+
+  .timeline-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+}

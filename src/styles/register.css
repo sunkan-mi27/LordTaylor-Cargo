@@ -312,3 +312,13 @@
     font-size: 0.92rem;
   }
 }
+
+.auth-error {
+  margin: 18px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 90, 90, 0.35);
+  border-radius: 8px;
+  background: rgba(255, 70, 70, 0.08);
+  color: #ff8f8f;
+  font-size: 13px;
+}

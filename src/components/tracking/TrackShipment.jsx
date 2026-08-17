@@ -8,12 +8,104 @@ import {
   FaClock,
   FaShield,
   FaLocationDot,
+  FaCircleCheck,
+  FaTruckFast,
 } from "react-icons/fa6";
-
-import shipments from "../../data/shipments";
 
 import "./TrackShipment.css";
 import TrackEmptyState from "./TrackEmptyState";
+
+const STATUS_ORDER = ["BOOKED", "PROCESSING", "IN_TRANSIT", "DELIVERED"];
+
+const STATUS_LABELS = {
+  BOOKED: "Booking Confirmed",
+  PROCESSING: "Shipment Processing",
+  IN_TRANSIT: "In Transit",
+  DELIVERED: "Delivered",
+};
+
+const formatStatus = (status) => {
+  return (
+    status
+      ?.toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase()) || "Unknown"
+  );
+};
+
+const formatDate = (date) => {
+  if (!date) return "Not available";
+
+  return new Date(date).toLocaleDateString("en-NG", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const formatTime = (date) => {
+  if (!date) return "";
+
+  return new Date(date).toLocaleTimeString("en-NG", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const formatEstimatedArrival = (date) => {
+  if (!date) return "Not available";
+
+  return new Date(date).toLocaleDateString("en-NG", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const getCountryFlag = (address = "") => {
+  const value = address.toLowerCase();
+
+  if (value.includes("united kingdom") || value.includes("london")) {
+    return "🇬🇧";
+  }
+
+  if (
+    value.includes("nigeria") ||
+    value.includes("lagos") ||
+    value.includes("abuja") ||
+    value.includes("lekki") ||
+    value.includes("ikorodu")
+  ) {
+    return "🇳🇬";
+  }
+
+  return "🌍";
+};
+
+const getCountryCode = (address = "") => {
+  const value = address.toLowerCase();
+
+  if (
+    value.includes("united kingdom") ||
+    value.includes("london") ||
+    value.includes("uk")
+  ) {
+    return "UK";
+  }
+
+  if (
+    value.includes("nigeria") ||
+    value.includes("lagos") ||
+    value.includes("abuja") ||
+    value.includes("lekki") ||
+    value.includes("ikorodu")
+  ) {
+    return "NG";
+  }
+
+  return "INTL";
+};
 
 const TrackShipment = () => {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -23,7 +115,7 @@ const TrackShipment = () => {
   const [searchComplete, setSearchComplete] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const searchValue = trackingNumber.trim();
 
     if (!searchValue) return;
@@ -33,38 +125,56 @@ const TrackShipment = () => {
     setNotFound(false);
     setSearchComplete(false);
 
-    setTimeout(() => {
-      const found = shipments.find(
-        (item) =>
-          item.trackingNumber.toLowerCase() === searchValue.toLowerCase(),
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/bookings/track/${searchValue}`,
       );
 
-      if (found) {
-        setShipment(found);
-        setNotFound(false);
-      } else {
-        setShipment(null);
-        setNotFound(true);
+      const data = await response.json();
+
+      console.log("Tracking API response:", data);
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Shipment not found");
       }
 
+      setShipment(data.shipment);
+    } catch (error) {
+      console.error("Tracking error:", error);
+
+      setShipment(null);
+      setNotFound(true);
+    } finally {
       setLoading(false);
       setSearchComplete(true);
-    }, 800);
+    }
   };
 
-  const getProgress = (currentShipment) => {
-    if (!currentShipment) return 0;
+  const progress = shipment?.progress ?? 0;
 
-    const completedSteps = currentShipment.timeline.filter(
-      (step) => step.completed,
-    ).length;
+  const currentStatus = shipment?.status || "BOOKED";
 
-    const totalSteps = currentShipment.timeline.length;
+  const currentStatusIndex = STATUS_ORDER.indexOf(currentStatus);
 
-    return Math.round((completedSteps / totalSteps) * 100);
+  const originFlag = getCountryFlag(shipment?.origin);
+  const destinationFlag = getCountryFlag(shipment?.destination);
+
+  const originCode = getCountryCode(shipment?.origin);
+  const destinationCode = getCountryCode(shipment?.destination);
+
+  const getStageState = (status) => {
+    const stageIndex = STATUS_ORDER.indexOf(status);
+
+    if (stageIndex < currentStatusIndex) {
+      return "completed";
+    }
+
+    if (stageIndex === currentStatusIndex) {
+      return "active";
+    }
+
+    return "pending";
   };
-
-  const progress = getProgress(shipment);
 
   return (
     <section className="tracking-page">
@@ -73,17 +183,9 @@ const TrackShipment = () => {
 
         <motion.div
           className="tracking-hero"
-          initial={{
-            opacity: 0,
-            y: 35,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.6,
-          }}
+          initial={{ opacity: 0, y: 35 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
           <span className="tracking-tag">Live Shipment Tracking</span>
 
@@ -99,32 +201,31 @@ const TrackShipment = () => {
 
         <motion.div
           className="tracking-search"
-          initial={{
-            opacity: 0,
-            y: 30,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.2,
-          }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
-          <input
-            type="text"
-            placeholder="Enter Tracking Number"
-            value={trackingNumber}
-            disabled={loading}
-            onChange={(event) => setTrackingNumber(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                handleSearch();
-              }
-            }}
-          />
+          <div className="tracking-input-wrapper">
+            <FaMagnifyingGlass />
 
-          <button onClick={handleSearch} disabled={loading}>
+            <input
+              type="text"
+              placeholder="Enter tracking number"
+              value={trackingNumber}
+              disabled={loading}
+              onChange={(event) => setTrackingNumber(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+            />
+          </div>
+
+          <button
+            onClick={handleSearch}
+            disabled={loading || !trackingNumber.trim()}
+          >
             {loading ? (
               <>
                 <span className="spinner" />
@@ -152,53 +253,62 @@ const TrackShipment = () => {
           />
         )}
 
-        {/* SHIPMENT RESULT */}
+        {/* SHIPMENT */}
 
         {shipment && (
           <>
+            {/* SHIPMENT HEADER */}
+
+            <motion.div
+              className="shipment-result-header"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <div>
+                <span>TRACKING NUMBER</span>
+
+                <h3>{shipment.trackingNumber}</h3>
+              </div>
+
+              <div className={`shipment-status ${currentStatus.toLowerCase()}`}>
+                <span className="status-indicator" />
+                {formatStatus(currentStatus)}
+              </div>
+            </motion.div>
+
             {/* OVERVIEW + ROUTE */}
 
             <div className="tracking-grid">
-              {/* SHIPMENT OVERVIEW */}
+              {/* OVERVIEW */}
 
               <motion.div
                 className="overview-card"
-                initial={{
-                  opacity: 0,
-                  x: -40,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-                transition={{
-                  duration: 0.6,
-                }}
+                initial={{ opacity: 0, x: -40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
               >
                 <div className="card-header">
-                  <h2>Shipment Overview</h2>
+                  <div>
+                    <span className="card-eyebrow">SHIPMENT</span>
+
+                    <h2>Shipment Overview</h2>
+                  </div>
 
                   <div className="status-pill">
-                    <FaPlaneDeparture />
-
-                    <span>{shipment.status}</span>
+                    <FaTruckFast />
+                    <span>{formatStatus(currentStatus)}</span>
                   </div>
                 </div>
 
                 <div className="overview-grid">
-                  {/* TRACKING NUMBER */}
-
                   <div className="overview-item">
                     <FaBox />
 
                     <div>
                       <span>Tracking Number</span>
-
                       <h4>{shipment.trackingNumber}</h4>
                     </div>
                   </div>
-
-                  {/* ESTIMATED ARRIVAL */}
 
                   <div className="overview-item">
                     <FaClock />
@@ -206,81 +316,93 @@ const TrackShipment = () => {
                     <div>
                       <span>Estimated Arrival</span>
 
-                      <h4>{shipment.estimatedDelivery}</h4>
+                      <h4>
+                        {formatEstimatedArrival(shipment.estimatedDelivery)}
+                      </h4>
                     </div>
                   </div>
-
-                  {/* SERVICE */}
 
                   <div className="overview-item">
                     <FaPlaneDeparture />
 
                     <div>
                       <span>Service</span>
-
-                      <h4>{shipment.shippingMethod}</h4>
+                      <h4>{shipment.booking?.service || "Standard"}</h4>
                     </div>
                   </div>
-
-                  {/* INSURANCE */}
 
                   <div className="overview-item">
                     <FaShield />
 
                     <div>
                       <span>Package</span>
-
-                      <h4>{shipment.package.type}</h4>
+                      <h4>{shipment.booking?.packageType || "Package"}</h4>
                     </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* LIVE ROUTE */}
+              {/* ROUTE */}
 
               <motion.div
                 className="route-card"
-                initial={{
-                  opacity: 0,
-                  x: 40,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-                transition={{
-                  duration: 0.6,
-                }}
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
               >
-                <h2>Live Route</h2>
+                <div className="card-header">
+                  <div>
+                    <span className="card-eyebrow">SHIPMENT ROUTE</span>
+
+                    <h2>Live Route</h2>
+                  </div>
+
+                  <span className="route-live">LIVE</span>
+                </div>
 
                 <div className="route-wrapper">
-                  <div className="country">
-                    <h3>🇳🇬</h3>
+                  <div className="route-location">
+                    <div className="route-flag">{originFlag}</div>
+
+                    <strong>{originCode}</strong>
 
                     <span>{shipment.origin}</span>
                   </div>
 
-                  <div className="flight-line">
-                    <div
-                      className="flight-progress"
-                      style={{
-                        width: `${progress}%`,
-                      }}
-                    />
+                  <div className="route-track">
+                    <div className="route-track-line">
+                      <motion.div
+                        className="route-track-progress"
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: `${progress}%`,
+                        }}
+                        transition={{
+                          duration: 1,
+                          ease: "easeOut",
+                        }}
+                      />
+                    </div>
 
-                    <div
-                      className="plane"
-                      style={{
+                    <motion.div
+                      className="route-plane"
+                      initial={{ left: 0 }}
+                      animate={{
                         left: `${progress}%`,
+                      }}
+                      transition={{
+                        duration: 1,
+                        ease: "easeOut",
                       }}
                     >
                       ✈️
-                    </div>
+                    </motion.div>
                   </div>
 
-                  <div className="country">
-                    <h3>🇬🇧</h3>
+                  <div className="route-location destination">
+                    <div className="route-flag">{destinationFlag}</div>
+
+                    <strong>{destinationCode}</strong>
 
                     <span>{shipment.destination}</span>
                   </div>
@@ -298,16 +420,27 @@ const TrackShipment = () => {
                   <div className="progress-bar">
                     <motion.div
                       className="progress-fill"
-                      initial={{
-                        width: 0,
-                      }}
+                      initial={{ width: 0 }}
                       animate={{
                         width: `${progress}%`,
                       }}
                       transition={{
                         duration: 1,
+                        ease: "easeOut",
                       }}
                     />
+                  </div>
+
+                  <div className="progress-status">
+                    <span>
+                      {currentStatus === "DELIVERED"
+                        ? "Shipment delivered successfully"
+                        : currentStatus === "IN_TRANSIT"
+                          ? "Shipment is currently in transit"
+                          : currentStatus === "PROCESSING"
+                            ? "Shipment is being prepared for dispatch"
+                            : "Booking has been confirmed"}
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -320,54 +453,73 @@ const TrackShipment = () => {
 
               <motion.div
                 className="timeline-card"
-                initial={{
-                  opacity: 0,
-                  y: 30,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  delay: 0.3,
-                }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
               >
-                <h2>Shipment Timeline</h2>
+                <div className="card-header">
+                  <div>
+                    <span className="card-eyebrow">SHIPMENT ACTIVITY</span>
+
+                    <h2>Shipment Timeline</h2>
+                  </div>
+                </div>
 
                 <div className="timeline">
-                  {shipment.timeline.map((step, index) => {
-                    const previousCompleted =
-                      shipment.timeline[index - 1]?.completed;
+                  {STATUS_ORDER.map((status, index) => {
+                    const state = getStageState(status);
 
-                    const isActive = !step.completed && previousCompleted;
+                    const event = shipment.trackingEvents?.find(
+                      (item) => item.title === STATUS_LABELS[status],
+                    );
 
                     return (
-                      <div
-                        key={`${step.title}-${index}`}
-                        className={`timeline-item ${
-                          step.completed
-                            ? "completed"
-                            : isActive
-                              ? "active"
-                              : ""
-                        }`}
-                      >
-                        <div className="timeline-dot" />
+                      <div key={status} className={`timeline-item ${state}`}>
+                        <div className="timeline-marker">
+                          {state === "completed" ? (
+                            <FaCircleCheck />
+                          ) : state === "active" ? (
+                            <span className="active-marker" />
+                          ) : (
+                            <span className="pending-marker" />
+                          )}
+                        </div>
 
                         <div className="timeline-content">
-                          <h4>{step.title}</h4>
+                          <div className="timeline-heading">
+                            <h4>{STATUS_LABELS[status]}</h4>
 
-                          <p>
-                            <FaLocationDot />
+                            {state === "active" && (
+                              <span className="timeline-active">CURRENT</span>
+                            )}
 
-                            {step.location}
-                          </p>
+                            {state === "completed" && (
+                              <span className="timeline-complete">
+                                COMPLETED
+                              </span>
+                            )}
+                          </div>
 
-                          <small>
-                            {step.date}
-                            {" • "}
-                            {step.time}
-                          </small>
+                          {event && (
+                            <>
+                              <p>
+                                <FaLocationDot />
+                                {event.location}
+                              </p>
+
+                              <small>
+                                {formatDate(event.eventDate)}
+                                {" • "}
+                                {formatTime(event.eventDate)}
+                              </small>
+                            </>
+                          )}
+
+                          {state === "pending" && (
+                            <small className="pending-text">
+                              Awaiting shipment progress
+                            </small>
+                          )}
                         </div>
                       </div>
                     );
@@ -379,24 +531,18 @@ const TrackShipment = () => {
 
               <motion.div
                 className="status-card"
-                initial={{
-                  opacity: 0,
-                  y: 30,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  delay: 0.45,
-                }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 }}
               >
+                <span className="card-eyebrow">LIVE STATUS</span>
+
                 <h2>Current Shipment Status</h2>
 
                 <div className="status-live">
                   <div className="status-pulse" />
 
-                  <span>{shipment.status}</span>
+                  <span>{formatStatus(currentStatus)}</span>
                 </div>
 
                 <div className="status-details">
@@ -404,9 +550,9 @@ const TrackShipment = () => {
                     <span>Current Route</span>
 
                     <strong>
-                      {shipment.origin}
+                      {originCode}
                       {" → "}
-                      {shipment.destination}
+                      {destinationCode}
                     </strong>
                   </div>
 
@@ -419,20 +565,32 @@ const TrackShipment = () => {
                   <div className="status-row">
                     <span>Estimated Arrival</span>
 
-                    <strong>{shipment.estimatedDelivery}</strong>
+                    <strong>
+                      {formatEstimatedArrival(shipment.estimatedDelivery)}
+                    </strong>
                   </div>
 
                   <div className="status-row">
                     <span>Service</span>
 
-                    <strong>{shipment.shippingMethod}</strong>
+                    <strong>{shipment.booking?.service || "Standard"}</strong>
                   </div>
 
                   <div className="status-row">
-                    <span>Package</span>
+                    <span>Package Weight</span>
 
-                    <strong>{shipment.package.weight}</strong>
+                    <strong>{shipment.booking?.weight ?? "—"} kg</strong>
                   </div>
+                </div>
+
+                <div className="last-update">
+                  <span>Last updated</span>
+
+                  <strong>
+                    {formatDate(shipment.lastUpdate)}
+                    {" • "}
+                    {formatTime(shipment.lastUpdate)}
+                  </strong>
                 </div>
               </motion.div>
             </div>

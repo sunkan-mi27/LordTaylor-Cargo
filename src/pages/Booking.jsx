@@ -270,24 +270,77 @@ const BookShipment = () => {
      PAYMENT
   ========================================= */
 
-  const handleConfirmPayment = () => {
+  const handleConfirmPayment = async () => {
     if (creatingShipment) return;
 
     setCreatingShipment(true);
 
-    setTimeout(() => {
-      const id =
-        "LT-" +
-        new Date().getFullYear() +
-        Math.floor(100000 + Math.random() * 900000);
+    try {
+      const token = localStorage.getItem("lordtaylor-token");
 
-      setTrackingId(id);
+      if (!token) {
+        throw new Error("You are not logged in.");
+      }
+
+      const paymentMethodMap = {
+        Visa: "CARD",
+        Mastercard: "CARD",
+        "Bank Transfer": "BANK_TRANSFER",
+        "Pay on Delivery": "PAY_ON_DELIVERY",
+      };
+
+      const bookingBody = {
+        senderName: sender.fullName,
+        senderPhone: sender.phone,
+        senderEmail: sender.email,
+
+        receiverName: receiver.fullName,
+        receiverPhone: receiver.phone,
+
+        pickup: `${sender.address}, ${sender.city}, ${sender.state}, ${sender.country}`,
+        destination: `${receiver.address}, ${receiver.city}, ${receiver.state}, ${receiver.country}`,
+
+        packageType: parcel.packageType,
+        weight: Number(parcel.weight),
+
+        service: parcel.shippingMethod,
+
+        paymentMethod: paymentMethodMap[payment.method] || "CARD",
+
+        estimatedCost: Number(total),
+
+        pickupDate: new Date().toISOString(),
+      };
+
+      console.log("Sending booking:", bookingBody);
+
+      const response = await fetch("http://localhost:5000/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(bookingBody),
+      });
+
+      const data = await response.json();
+
+      console.log("Booking API response:", data);
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to create booking");
+      }
+
+      setTrackingId(data.booking.shipment.trackingNumber);
 
       setCreatingShipment(false);
       setBookingComplete(true);
-    }, 2200);
-  };
+    } catch (error) {
+      console.error("Booking creation error:", error);
 
+      setCreatingShipment(false);
+    }
+  };
   /* =========================================
      SUCCESS
   ========================================= */

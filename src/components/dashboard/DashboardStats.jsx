@@ -7,44 +7,42 @@ import {
   FaClipboardList,
 } from "react-icons/fa6";
 
-import shipments from "../../data/shipments";
+const DashboardStats = ({ stats, loading }) => {
+  const dashboardStats = stats || {
+    total: 0,
+    booked: 0,
+    processing: 0,
+    inTransit: 0,
+    delivered: 0,
+    cancelled: 0,
+    totalSpent: 0,
+  };
 
-const DashboardStats = () => {
-  const activeShipments = shipments.filter(
-    (shipment) => shipment.statusType === "transit",
-  ).length;
-
-  const deliveredShipments = shipments.filter(
-    (shipment) => shipment.statusType === "delivered",
-  ).length;
-
-  const totalShipments = shipments.length;
-
-  const stats = [
+  const cards = [
     {
       id: 1,
       title: "Active Shipments",
-      value: activeShipments,
+      value: dashboardStats.inTransit,
       icon: FaShip,
       color: "#22c55e",
-      change: `${activeShipments} active`,
+      change: `${dashboardStats.inTransit} active`,
       positive: true,
     },
 
     {
       id: 2,
       title: "Delivered",
-      value: deliveredShipments,
+      value: dashboardStats.delivered,
       icon: FaCircleCheck,
       color: "#3b82f6",
-      change: `${deliveredShipments} completed`,
+      change: `${dashboardStats.delivered} completed`,
       positive: true,
     },
 
     {
       id: 3,
       title: "Total Shipments",
-      value: totalShipments,
+      value: dashboardStats.total,
       icon: FaClipboardList,
       color: "#f59e0b",
       change: "All time",
@@ -73,17 +71,21 @@ const DashboardStats = () => {
       </div>
 
       <div className="stats-grid">
-        {stats.map((stat) => (
-          <StatCard
-            key={stat.id}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            color={stat.color}
-            change={stat.change}
-            positive={stat.positive}
-          />
-        ))}
+        {cards.map((stat) => {
+          const Icon = stat.icon;
+
+          return (
+            <StatCard
+              key={stat.id}
+              title={stat.title}
+              value={loading ? "..." : stat.value}
+              icon={<Icon />}
+              color={stat.color}
+              change={stat.change}
+              positive={stat.positive}
+            />
+          );
+        })}
       </div>
     </section>
   );

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ShipmentDetailsDrawer from "../components/ShipmentDetailsDrawer";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -6,19 +6,81 @@ import ShipmentSearch from "../components/ShipmentSearch";
 import ShipmentFilter from "../components/ShipmentFilter";
 import ShipmentCard from "../components/ShipmentCard";
 
-import shipments from "../data/shipments";
-
 import "../styles/shipment-history.css";
 
 export default function ShipmentHistory() {
+  const [shipments, setShipments] = useState([]);
   const [selectedShipment, setSelectedShipment] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const openDrawer = (shipment) => {
-    setSelectedShipment(shipment);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const token = localStorage.getItem("lordtaylor-token");
+
+      if (!token) {
+        throw new Error("Authentication required. Please log in again.");
+      }
+
+      const response = await fetch(
+        "http://localhost:5000/api/bookings/history",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Unable to load shipments");
+      }
+
+      setShipments(data.bookings || []);
+    } catch (error) {
+      console.error("History error:", error);
+      setError(error.message || "Unable to load shipments");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const openDrawer = (booking) => {
+    const shipmentData = {
+      ...booking,
+
+      ...booking.shipment,
+
+      from: booking.pickup,
+      to: booking.destination,
+      type: booking.packageType,
+      weight: booking.weight,
+      service: booking.service,
+
+      status: booking.shipment?.status || booking.status,
+
+      progress: booking.shipment?.progress ?? 0,
+
+      trackingNumber: booking.shipment?.trackingNumber,
+
+      trackingEvents: booking.shipment?.trackingEvents || [],
+    };
+
+    setSelectedShipment(shipmentData);
     setDrawerOpen(true);
   };
 
@@ -26,23 +88,31 @@ export default function ShipmentHistory() {
     return shipments.filter((shipment) => {
       const search = searchTerm.toLowerCase().trim();
 
-      const matchesSearch =
-        shipment.trackingNumber.toLowerCase().includes(search) ||
-        shipment.destination.toLowerCase().includes(search) ||
-        shipment.receiver.name.toLowerCase().includes(search);
+      const trackingNumber =
+        shipment.shipment?.trackingNumber?.toLowerCase() || "";
 
-      const matchesFilter =
-        activeFilter === "All" || shipment.status === activeFilter;
+      const destination = shipment.destination?.toLowerCase() || "";
+
+      const receiver = shipment.receiverName?.toLowerCase() || "";
+
+      const matchesSearch =
+        trackingNumber.includes(search) ||
+        destination.includes(search) ||
+        receiver.includes(search);
+
+      const status = shipment.status?.replace("_", " ").toLowerCase();
+
+      const filter = activeFilter.toLowerCase();
+
+      const matchesFilter = activeFilter === "All" || status === filter;
 
       return matchesSearch && matchesFilter;
     });
-  }, [searchTerm, activeFilter]);
+  }, [shipments, searchTerm, activeFilter]);
 
   return (
     <DashboardLayout>
       <div className="shipment-history-page">
-        {/* HEADER */}
-
         <div className="shipment-history-header">
           <span className="shipment-history-badge">Shipment Center</span>
 
@@ -51,20 +121,34 @@ export default function ShipmentHistory() {
           <p>Track every shipment you've booked with LordTaylor Logistics.</p>
         </div>
 
-        {/* SEARCH */}
-
         <ShipmentSearch value={searchTerm} onChange={setSearchTerm} />
-
-        {/* FILTER */}
 
         <ShipmentFilter
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}
         />
 
-        {/* SHIPMENTS */}
+        {loading ? (
+          <div className="shipment-empty-state">
+            <div className="empty-icon">📦</div>
 
-        {filteredShipments.length > 0 ? (
+            <h2>Loading shipments...</h2>
+
+            <p>We're retrieving your shipment history.</p>
+          </div>
+        ) : error ? (
+          <div className="shipment-empty-state">
+            <div className="empty-icon">⚠️</div>
+
+            <h2>Unable to load shipments</h2>
+
+            <p>{error}</p>
+
+            <button className="empty-reset-btn" onClick={fetchHistory}>
+              Try Again
+            </button>
+          </div>
+        ) : filteredShipments.length > 0 ? (
           <div className="shipment-list">
             {filteredShipments.map((shipment) => (
               <ShipmentCard
@@ -96,8 +180,6 @@ export default function ShipmentHistory() {
             </button>
           </div>
         )}
-
-        {/* DETAILS DRAWER */}
 
         <ShipmentDetailsDrawer
           shipment={selectedShipment}

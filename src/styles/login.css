@@ -341,3 +341,18 @@
     align-items: flex-start;
   }
 }
+.login-error {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  border-radius: 10px;
+  background: rgba(255, 80, 80, 0.08);
+  color: #ff8a8a;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.login-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
