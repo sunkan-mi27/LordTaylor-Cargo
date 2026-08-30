@@ -7,6 +7,129 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  password      String
+  role          UserRole       @default(CUSTOMER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  bookings      Booking[]
+  notifications Notification[]
+  profile       Profile?
+  settings      UserSettings?
+}
+
+model Profile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  firstName          String?
+  lastName           String?
+  phone              String?
+  country            String?
+  city               String?
+  avatarUrl          String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  addressLine        String?
+  addressType        String?
+  deliveryPreference String?
+  postalCode         String?
+  state              String?
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Booking {
+  id            String         @id @default(cuid())
+  bookingId     String         @unique
+  userId        String
+  senderName    String
+  senderPhone   String?
+  senderEmail   String?
+  receiverName  String
+  receiverPhone String?
+  pickup        String
+  destination   String
+  packageType   String
+  weight        Float
+  pickupDate    DateTime?
+  service       String
+  paymentMethod PaymentMethod
+  estimatedCost Float
+  status        ShipmentStatus @default(BOOKED)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment       Payment?
+  shipment      Shipment?
+}
+
+model Shipment {
+  id                String          @id @default(cuid())
+  trackingNumber    String          @unique
+  bookingId         String          @unique
+  status            ShipmentStatus  @default(BOOKED)
+  origin            String
+  destination       String
+  estimatedDelivery DateTime?
+  lastUpdate        String?
+  progress          Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  booking           Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  trackingEvents    TrackingEvent[]
+}
+
+model TrackingEvent {
+  id          String   @id @default(cuid())
+  shipmentId  String
+  title       String
+  location    String
+  description String?
+  eventDate   DateTime
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  shipment    Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model UserSettings {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  shipmentUpdates   Boolean  @default(true)
+  deliveryAlerts    Boolean  @default(true)
+  promotionalEmails Boolean  @default(false)
+  language          String   @default("English")
+  timezone          String   @default("West Africa Time (WAT)")
+  theme             String   @default("Dark")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  bookingId     String        @unique
+  amount        Float
+  method        PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  transactionId String?
+  txRef         String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  booking       Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 enum UserRole {
   CUSTOMER
   ADMIN
@@ -30,134 +153,4 @@ enum PaymentMethod {
   PAY_ON_DELIVERY
   CARD
   BANK_TRANSFER
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  role      UserRole @default(CUSTOMER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  profile       Profile?
-  bookings      Booking[]
-  notifications Notification[]
-}
-
-model Profile {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-
-  firstName String?
-  lastName  String?
-  phone     String?
-  country   String?
-  city      String?
-  avatarUrl String?
-
-  addressLine        String?
-  state              String?
-  postalCode         String?
-  addressType        String?
-  deliveryPreference String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Booking {
-  id        String @id @default(cuid())
-  bookingId String @unique
-  userId    String
-
-  senderName  String
-  senderPhone String?
-  senderEmail String?
-
-  receiverName  String
-  receiverPhone String?
-
-  pickup      String
-  destination String
-
-  packageType   String
-  weight        Float
-  pickupDate    DateTime?
-  service       String
-  paymentMethod PaymentMethod
-  estimatedCost Float
-
-  status ShipmentStatus @default(BOOKED)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shipment Shipment?
-  payment  Payment?
-}
-
-model Shipment {
-  id             String @id @default(cuid())
-  trackingNumber String @unique
-  bookingId      String @unique
-
-  status            ShipmentStatus @default(BOOKED)
-  origin            String
-  destination       String
-  estimatedDelivery DateTime?
-  lastUpdate        String?
-  progress          Int            @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  booking        Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  trackingEvents TrackingEvent[]
-}
-
-model TrackingEvent {
-  id         String @id @default(cuid())
-  shipmentId String
-
-  title       String
-  location    String
-  description String?
-  eventDate   DateTime
-  completed   Boolean  @default(false)
-
-  createdAt DateTime @default(now())
-
-  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
-}
-
-model Payment {
-  id        String @id @default(cuid())
-  bookingId String @unique
-
-  amount        Float
-  method        PaymentMethod
-  status        PaymentStatus @default(PENDING)
-  transactionId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-}
-
-model Notification {
-  id     String @id @default(cuid())
-  userId String
-
-  title   String
-  message String
-  read    Boolean @default(false)
-
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

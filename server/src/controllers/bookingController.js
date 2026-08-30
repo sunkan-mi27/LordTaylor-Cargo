@@ -1,13 +1,62 @@
+import crypto from "crypto";
 import prisma from "../config/prisma.js";
+import { notifyUser, notifyAdmins } from "../utils/notify.js";
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const VALID_SERVICES = ["Standard", "Express", "Economy"];
+
+const VALID_PAYMENT_METHODS = ["PAY_ON_DELIVERY", "CARD", "BANK_TRANSFER"];
+
+const VALID_STATUSES = [
+  "BOOKED",
+  "PROCESSING",
+  "IN_TRANSIT",
+  "DELIVERED",
+  "CANCELLED",
+];
+
+const STATUS_PROGRESS = {
+  BOOKED: 0,
+  PROCESSING: 33,
+  IN_TRANSIT: 66,
+  DELIVERED: 100,
+  CANCELLED: 0,
+};
+
+const STATUS_EVENT_TITLES = {
+  BOOKED: "Booking Confirmed",
+  PROCESSING: "Shipment Processing",
+  IN_TRANSIT: "In Transit",
+  DELIVERED: "Delivered",
+  CANCELLED: "Shipment Cancelled",
+};
+
+const STATUS_ORDER = ["BOOKED", "PROCESSING", "IN_TRANSIT", "DELIVERED"];
+
+/* =========================================================
+   ID GENERATORS
+========================================================= */
 
 const generateBookingId = () => {
-  return `LT-${Date.now().toString().slice(-8)}`;
+  const timestamp = Date.now().toString(36).toUpperCase();
+
+  const random = crypto.randomBytes(3).toString("hex").toUpperCase();
+
+  return `LT-${timestamp}-${random}`;
 };
 
 const generateTrackingNumber = () => {
-  const random = Math.floor(100000000 + Math.random() * 900000000);
+  const random = crypto.randomBytes(5).toString("hex").toUpperCase();
+
   return `LT${random}`;
 };
+
+/* =========================================================
+   DELIVERY CALCULATION
+========================================================= */
 
 const calculateEstimatedDelivery = (pickupDate, service) => {
   const startDate = pickupDate ? new Date(pickupDate) : new Date();
@@ -21,10 +70,81 @@ const calculateEstimatedDelivery = (pickupDate, service) => {
   const days = deliveryDays[service] ?? 3;
 
   const estimatedDate = new Date(startDate);
+
   estimatedDate.setDate(estimatedDate.getDate() + days);
 
   return estimatedDate;
 };
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const cleanString = (value) => {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value.trim();
+};
+
+const isValidDate = (value) => {
+  if (!value) {
+    return true;
+  }
+
+  const date = new Date(value);
+
+  return !Number.isNaN(date.getTime());
+};
+
+const isValidPositiveNumber = (value) => {
+  const number = Number(value);
+
+  return Number.isFinite(number) && number > 0;
+};
+
+const isValidNonNegativeNumber = (value) => {
+  const number = Number(value);
+
+  return Number.isFinite(number) && number >= 0;
+};
+
+const isStatusTransitionAllowed = (currentStatus, nextStatus) => {
+  if (currentStatus === nextStatus) {
+    return true;
+  }
+
+  // Delivered shipments cannot move backwards.
+  if (currentStatus === "DELIVERED") {
+    return false;
+  }
+
+  // Cancelled shipments are terminal.
+  if (currentStatus === "CANCELLED") {
+    return false;
+  }
+
+  // Cancellation is allowed before delivery.
+  if (nextStatus === "CANCELLED") {
+    return true;
+  }
+
+  const currentIndex = STATUS_ORDER.indexOf(currentStatus);
+
+  const nextIndex = STATUS_ORDER.indexOf(nextStatus);
+
+  if (currentIndex === -1 || nextIndex === -1) {
+    return false;
+  }
+
+  // Shipment status should move forward only.
+  return nextIndex >= currentIndex;
+};
+
+/* =========================================================
+   CREATE BOOKING
+========================================================= */
 
 export const createBooking = async (req, res) => {
   try {
@@ -44,17 +164,46 @@ export const createBooking = async (req, res) => {
       estimatedCost,
     } = req.body;
 
-    // Validate required fields
+    /* -------------------------------------------------------
+       AUTHENTICATION
+    ------------------------------------------------------- */
+
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+
+    /* -------------------------------------------------------
+       CLEAN INPUT
+    ------------------------------------------------------- */
+
+    const cleanSenderName = cleanString(senderName);
+    const cleanSenderPhone = cleanString(senderPhone);
+    const cleanSenderEmail = cleanString(senderEmail);
+    const cleanReceiverName = cleanString(receiverName);
+    const cleanReceiverPhone = cleanString(receiverPhone);
+    const cleanPickup = cleanString(pickup);
+    const cleanDestination = cleanString(destination);
+    const cleanPackageType = cleanString(packageType);
+    const cleanService = cleanString(service);
+    const cleanPaymentMethod = cleanString(paymentMethod);
+
+    /* -------------------------------------------------------
+       REQUIRED FIELDS
+    ------------------------------------------------------- */
+
     if (
-      !senderName ||
-      !receiverName ||
-      !pickup ||
-      !destination ||
-      !packageType ||
-      !weight ||
-      !service ||
-      !paymentMethod ||
-      estimatedCost === undefined
+      !cleanSenderName ||
+      !cleanReceiverName ||
+      !cleanPickup ||
+      !cleanDestination ||
+      !cleanPackageType ||
+      !cleanService ||
+      !cleanPaymentMethod ||
+      estimatedCost === undefined ||
+      estimatedCost === null
     ) {
       return res.status(400).json({
         success: false,
@@ -62,94 +211,241 @@ export const createBooking = async (req, res) => {
       });
     }
 
+    /* -------------------------------------------------------
+       VALIDATE WEIGHT
+    ------------------------------------------------------- */
+
+    if (!isValidPositiveNumber(weight)) {
+      return res.status(400).json({
+        success: false,
+        message: "Shipment weight must be greater than zero",
+      });
+    }
+
+    /* -------------------------------------------------------
+       VALIDATE COST
+    ------------------------------------------------------- */
+
+    if (!isValidNonNegativeNumber(estimatedCost)) {
+      return res.status(400).json({
+        success: false,
+        message: "Estimated cost must be a valid amount",
+      });
+    }
+
+    /* -------------------------------------------------------
+       VALIDATE SERVICE
+    ------------------------------------------------------- */
+
+    if (!VALID_SERVICES.includes(cleanService)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid shipping service",
+      });
+    }
+
+    /* -------------------------------------------------------
+       VALIDATE PAYMENT METHOD
+    ------------------------------------------------------- */
+
+    if (!VALID_PAYMENT_METHODS.includes(cleanPaymentMethod)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment method",
+      });
+    }
+
+    /* -------------------------------------------------------
+       VALIDATE PICKUP DATE
+    ------------------------------------------------------- */
+
+    if (!isValidDate(pickupDate)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid pickup date",
+      });
+    }
+
+    const parsedPickupDate = pickupDate ? new Date(pickupDate) : null;
+
+    /* -------------------------------------------------------
+       GENERATE IDS
+    ------------------------------------------------------- */
+
     const bookingId = generateBookingId();
     const trackingNumber = generateTrackingNumber();
-    const estimatedDelivery = calculateEstimatedDelivery(pickupDate, service);
 
-    const booking = await prisma.booking.create({
-      data: {
-        bookingId,
-        userId: req.user.id,
+    const estimatedDelivery = calculateEstimatedDelivery(
+      parsedPickupDate,
+      cleanService,
+    );
 
-        senderName,
-        senderPhone,
-        senderEmail,
+    const now = new Date();
 
-        receiverName,
-        receiverPhone,
+    /* -------------------------------------------------------
+       ATOMIC TRANSACTION
+    ------------------------------------------------------- */
 
-        pickup,
-        destination,
+    const booking = await prisma.$transaction(async (transaction) => {
+      const createdBooking = await transaction.booking.create({
+        data: {
+          bookingId,
 
-        packageType,
-        weight: Number(weight),
-        pickupDate: pickupDate ? new Date(pickupDate) : null,
-        service,
-        paymentMethod,
-        estimatedCost: Number(estimatedCost),
+          userId: req.user.id,
 
-        shipment: {
-          create: {
-            trackingNumber,
-            origin: pickup,
-            destination,
-            status: "BOOKED",
-            progress: 0,
-            estimatedDelivery,
-            trackingEvents: {
-              create: [
-                {
-                  title: "Booking Confirmed",
-                  location: pickup,
-                  description: "Your shipment booking has been confirmed.",
-                  eventDate: new Date(),
-                  completed: true,
-                },
-                {
-                  title: "Shipment Processing",
-                  location: pickup,
-                  description: "Your shipment is being prepared for dispatch.",
-                  eventDate: new Date(),
-                  completed: false,
-                },
-                {
-                  title: "In Transit",
-                  location: destination,
-                  description:
-                    "Your shipment will move toward its destination.",
-                  eventDate: new Date(),
-                  completed: false,
-                },
-                {
-                  title: "Delivered",
-                  location: destination,
-                  description: "Shipment delivered successfully.",
-                  eventDate: new Date(),
-                  completed: false,
-                },
-              ],
+          senderName: cleanSenderName,
+          senderPhone: cleanSenderPhone || null,
+          senderEmail: cleanSenderEmail || null,
+
+          receiverName: cleanReceiverName,
+          receiverPhone: cleanReceiverPhone || null,
+
+          pickup: cleanPickup,
+          destination: cleanDestination,
+
+          packageType: cleanPackageType,
+
+          weight: Number(weight),
+
+          pickupDate: parsedPickupDate,
+
+          service: cleanService,
+
+          paymentMethod: cleanPaymentMethod,
+
+          estimatedCost: Number(estimatedCost),
+
+          status: "BOOKED",
+
+          shipment: {
+            create: {
+              trackingNumber,
+
+              status: "BOOKED",
+
+              origin: cleanPickup,
+
+              destination: cleanDestination,
+
+              estimatedDelivery,
+
+              lastUpdate: now.toISOString(),
+
+              progress: 0,
+
+              trackingEvents: {
+                create: [
+                  {
+                    title: "Booking Confirmed",
+
+                    location: cleanPickup,
+
+                    description: "Your shipment booking has been confirmed.",
+
+                    eventDate: now,
+
+                    completed: true,
+                  },
+
+                  {
+                    title: "Shipment Processing",
+
+                    location: cleanPickup,
+
+                    description:
+                      "Your shipment is being prepared for dispatch.",
+
+                    eventDate: now,
+
+                    completed: false,
+                  },
+
+                  {
+                    title: "In Transit",
+
+                    location: cleanDestination,
+
+                    description:
+                      "Your shipment will move toward its destination.",
+
+                    eventDate: now,
+
+                    completed: false,
+                  },
+
+                  {
+                    title: "Delivered",
+
+                    location: cleanDestination,
+
+                    description: "Shipment delivered successfully.",
+
+                    eventDate: now,
+
+                    completed: false,
+                  },
+
+                  {
+                    title: "Shipment Cancelled",
+
+                    location: cleanPickup,
+
+                    description: "This shipment has been cancelled.",
+
+                    eventDate: now,
+
+                    completed: false,
+                  },
+                ],
+              },
+            },
+          },
+
+          payment: {
+            create: {
+              amount: Number(estimatedCost),
+
+              method: cleanPaymentMethod,
+
+              status: "PENDING",
             },
           },
         },
 
-        payment: {
-          create: {
-            amount: Number(estimatedCost),
-            method: paymentMethod,
-            status: paymentMethod === "PAY_ON_DELIVERY" ? "PENDING" : "PENDING",
+        include: {
+          shipment: {
+            include: {
+              trackingEvents: {
+                orderBy: {
+                  eventDate: "asc",
+                },
+              },
+            },
           },
-        },
-      },
 
-      include: {
-        shipment: {
-          include: {
-            trackingEvents: true,
-          },
+          payment: true,
         },
-        payment: true,
-      },
+      });
+
+      return createdBooking;
     });
+
+    await notifyUser(
+      booking.userId,
+      "Booking Confirmed",
+      `Your shipment ${booking.bookingId} has been booked successfully.`,
+      { link: "/history" },
+    );
+
+    await notifyAdmins(
+      "New Booking",
+      `New booking ${booking.bookingId} from ${booking.senderName}.`,
+      { link: "/admin/bookings" },
+    );
+
+    /* -------------------------------------------------------
+       RESPONSE
+    ------------------------------------------------------- */
 
     return res.status(201).json({
       success: true,
@@ -159,15 +455,31 @@ export const createBooking = async (req, res) => {
   } catch (error) {
     console.error("Create booking error:", error);
 
+    /* -------------------------------------------------------
+       PRISMA UNIQUE CONSTRAINT
+    ------------------------------------------------------- */
+
+    if (error?.code === "P2002") {
+      return res.status(409).json({
+        success: false,
+        message: "A booking identifier conflict occurred. Please try again.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: "Something went wrong while creating your booking",
     });
   }
 };
+
+/* =========================================================
+   TRACK SHIPMENT
+========================================================= */
+
 export const trackShipment = async (req, res) => {
   try {
-    const { trackingNumber } = req.params;
+    const trackingNumber = cleanString(req.params.trackingNumber);
 
     if (!trackingNumber) {
       return res.status(400).json({
@@ -180,13 +492,29 @@ export const trackShipment = async (req, res) => {
       where: {
         trackingNumber,
       },
+
       include: {
         trackingEvents: {
           orderBy: {
             eventDate: "asc",
           },
         },
-        booking: true,
+
+        booking: {
+          select: {
+            bookingId: true,
+            senderName: true,
+            receiverName: true,
+            pickup: true,
+            destination: true,
+            packageType: true,
+            weight: true,
+            service: true,
+            status: true,
+            createdAt: true,
+            estimatedCost: true,
+          },
+        },
       },
     });
 
@@ -211,25 +539,26 @@ export const trackShipment = async (req, res) => {
   }
 };
 
+/* =========================================================
+   UPDATE SHIPMENT STATUS
+========================================================= */
+
 export const updateShipmentStatus = async (req, res) => {
   try {
-    const { trackingNumber } = req.params;
-    const { status } = req.body;
+    /* -------------------------------------------------------
+       ADMIN AUTHORIZATION
+    ------------------------------------------------------- */
 
-    const progressMap = {
-      BOOKED: 0,
-      PROCESSING: 33,
-      IN_TRANSIT: 66,
-      DELIVERED: 100,
-      CANCELLED: 0,
-    };
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({
+        success: false,
+        message: "Only administrators can update shipment status",
+      });
+    }
 
-    const eventMap = {
-      BOOKED: "Booking Confirmed",
-      PROCESSING: "Shipment Processing",
-      IN_TRANSIT: "In Transit",
-      DELIVERED: "Delivered",
-    };
+    const trackingNumber = cleanString(req.params.trackingNumber);
+
+    const status = cleanString(req.body.status).toUpperCase();
 
     if (!trackingNumber || !status) {
       return res.status(400).json({
@@ -238,19 +567,24 @@ export const updateShipmentStatus = async (req, res) => {
       });
     }
 
-    if (!(status in progressMap)) {
+    if (!VALID_STATUSES.includes(status)) {
       return res.status(400).json({
         success: false,
         message: "Invalid shipment status",
       });
     }
 
+    /* -------------------------------------------------------
+       FIND SHIPMENT
+    ------------------------------------------------------- */
+
     const shipment = await prisma.shipment.findUnique({
       where: {
         trackingNumber,
       },
+
       include: {
-        trackingEvents: true,
+        booking: true,
       },
     });
 
@@ -261,78 +595,167 @@ export const updateShipmentStatus = async (req, res) => {
       });
     }
 
-    const updatedShipment = await prisma.shipment.update({
-      where: {
-        trackingNumber,
-      },
-      data: {
-        status,
-        progress: progressMap[status],
-        lastUpdate: new Date().toISOString(),
-      },
-    });
+    /* -------------------------------------------------------
+       CHECK TRANSITION
+    ------------------------------------------------------- */
 
-    await prisma.booking.update({
-      where: {
-        id: shipment.bookingId,
-      },
-      data: {
-        status,
-      },
-    });
-
-    const statusOrder = ["BOOKED", "PROCESSING", "IN_TRANSIT", "DELIVERED"];
-
-    const currentIndex = statusOrder.indexOf(status);
-
-    // Mark every stage up to the current stage as completed
-    for (let i = 0; i <= currentIndex; i++) {
-      const eventTitle = eventMap[statusOrder[i]];
-
-      await prisma.trackingEvent.updateMany({
-        where: {
-          shipmentId: shipment.id,
-          title: eventTitle,
-        },
-        data: {
-          completed: true,
-        },
+    if (!isStatusTransitionAllowed(shipment.status, status)) {
+      return res.status(409).json({
+        success: false,
+        message: `Shipment cannot move from ${shipment.status} to ${status}`,
       });
     }
 
-    // Update the current event timestamp
-    const currentEventTitle = eventMap[status];
+    /* -------------------------------------------------------
+       NO-OP
+    ------------------------------------------------------- */
 
-    if (currentEventTitle) {
-      await prisma.trackingEvent.updateMany({
+    if (shipment.status === status) {
+      const currentShipment = await prisma.shipment.findUnique({
         where: {
-          shipmentId: shipment.id,
-          title: currentEventTitle,
+          trackingNumber,
         },
-        data: {
-          completed: true,
-          eventDate: new Date(),
-        },
-      });
-    }
 
-    const finalShipment = await prisma.shipment.findUnique({
-      where: {
-        trackingNumber,
-      },
-      include: {
-        trackingEvents: {
-          orderBy: {
-            eventDate: "asc",
+        include: {
+          trackingEvents: {
+            orderBy: {
+              eventDate: "asc",
+            },
           },
+
+          booking: true,
         },
-        booking: true,
-      },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Shipment is already at this status",
+        shipment: currentShipment,
+      });
+    }
+
+    const now = new Date();
+
+    /* -------------------------------------------------------
+       TRANSACTION
+    ------------------------------------------------------- */
+
+    const finalShipment = await prisma.$transaction(async (transaction) => {
+      await transaction.shipment.update({
+        where: {
+          trackingNumber,
+        },
+
+        data: {
+          status,
+
+          progress: STATUS_PROGRESS[status],
+
+          lastUpdate: now.toISOString(),
+        },
+      });
+
+      await transaction.booking.update({
+        where: {
+          id: shipment.bookingId,
+        },
+
+        data: {
+          status,
+        },
+      });
+
+      /* -----------------------------------------------
+             COMPLETE PREVIOUS EVENTS
+          ----------------------------------------------- */
+
+      if (status !== "CANCELLED") {
+        const currentIndex = STATUS_ORDER.indexOf(status);
+
+        if (currentIndex >= 0) {
+          for (let i = 0; i <= currentIndex; i++) {
+            const eventTitle = STATUS_EVENT_TITLES[STATUS_ORDER[i]];
+
+            await transaction.trackingEvent.updateMany({
+              where: {
+                shipmentId: shipment.id,
+
+                title: eventTitle,
+              },
+
+              data: {
+                completed: true,
+              },
+            });
+          }
+        }
+      }
+
+      /* -----------------------------------------------
+             CANCELLED
+          ----------------------------------------------- */
+
+      if (status === "CANCELLED") {
+        await transaction.trackingEvent.updateMany({
+          where: {
+            shipmentId: shipment.id,
+
+            title: "Shipment Cancelled",
+          },
+
+          data: {
+            completed: true,
+            eventDate: now,
+          },
+        });
+      }
+
+      /* -----------------------------------------------
+             CURRENT EVENT
+          ----------------------------------------------- */
+
+      const currentEventTitle = STATUS_EVENT_TITLES[status];
+
+      if (currentEventTitle && status !== "CANCELLED") {
+        await transaction.trackingEvent.updateMany({
+          where: {
+            shipmentId: shipment.id,
+
+            title: currentEventTitle,
+          },
+
+          data: {
+            completed: true,
+            eventDate: now,
+          },
+        });
+      }
+
+      /* -----------------------------------------------
+             RETURN UPDATED SHIPMENT
+          ----------------------------------------------- */
+
+      return transaction.shipment.findUnique({
+        where: {
+          trackingNumber,
+        },
+
+        include: {
+          trackingEvents: {
+            orderBy: {
+              eventDate: "asc",
+            },
+          },
+
+          booking: true,
+        },
+      });
     });
 
     return res.status(200).json({
       success: true,
       message: `Shipment status updated to ${status}`,
+
       shipment: finalShipment,
     });
   } catch (error) {
@@ -340,14 +763,24 @@ export const updateShipmentStatus = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message:
-        error.message || "Something went wrong while updating shipment status",
+      message: "Something went wrong while updating shipment status",
     });
   }
 };
 
+/* =========================================================
+   BOOKING HISTORY
+========================================================= */
+
 export const getBookingHistory = async (req, res) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+
     const bookings = await prisma.booking.findMany({
       where: {
         userId: req.user.id,
@@ -394,14 +827,26 @@ export const getBookingHistory = async (req, res) => {
   }
 };
 
+/* =========================================================
+   CUSTOMER DASHBOARD DATA
+========================================================= */
+
 export const getDashboardData = async (req, res) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+
     const userId = req.user.id;
 
     const bookings = await prisma.booking.findMany({
       where: {
         userId,
       },
+
       include: {
         shipment: {
           include: {
@@ -412,15 +857,22 @@ export const getDashboardData = async (req, res) => {
             },
           },
         },
+
         payment: true,
       },
+
       orderBy: {
         createdAt: "desc",
       },
     });
 
+    /* -------------------------------------------------------
+       STATS
+    ------------------------------------------------------- */
+
     const stats = {
       total: bookings.length,
+
       booked: bookings.filter((booking) => booking.status === "BOOKED").length,
 
       processing: bookings.filter((booking) => booking.status === "PROCESSING")
@@ -437,39 +889,63 @@ export const getDashboardData = async (req, res) => {
 
       totalSpent: bookings.reduce(
         (total, booking) => total + Number(booking.estimatedCost || 0),
+
         0,
       ),
     };
 
+    /* -------------------------------------------------------
+       RECENT SHIPMENTS
+    ------------------------------------------------------- */
+
     const recentShipments = bookings.slice(0, 5).map((booking) => ({
       id: booking.id,
+
       bookingId: booking.bookingId,
+
       trackingNumber: booking.shipment?.trackingNumber || null,
+
       senderName: booking.senderName,
+
       receiverName: booking.receiverName,
+
       pickup: booking.pickup,
+
       destination: booking.destination,
+
       status: booking.status,
+
       estimatedCost: booking.estimatedCost,
+
       createdAt: booking.createdAt,
-      progress: booking.shipment?.progress || 0,
+
+      progress: booking.shipment?.progress ?? 0,
     }));
+
+    /* -------------------------------------------------------
+       ACTIVITY
+    ------------------------------------------------------- */
 
     const activity = bookings
       .flatMap((booking) =>
         (booking.shipment?.trackingEvents || []).map((event) => ({
           id: event.id,
+
           title: event.title,
+
           description: event.description,
+
           location: event.location,
+
           eventDate: event.eventDate,
+
           trackingNumber: booking.shipment?.trackingNumber || null,
         })),
       )
       .sort((a, b) => new Date(b.eventDate) - new Date(a.eventDate))
       .slice(0, 8);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       stats,
       recentShipments,

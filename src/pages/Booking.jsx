@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import "../styles/booking.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const BookShipment = () => {
   const navigate = useNavigate();
 
@@ -303,7 +305,8 @@ const BookShipment = () => {
         packageType: parcel.packageType,
         weight: Number(parcel.weight),
 
-        service: parcel.shippingMethod,
+        service:
+          parcel.shippingMethod === "Express Delivery" ? "Express" : "Standard",
 
         paymentMethod: paymentMethodMap[payment.method] || "CARD",
 
@@ -314,7 +317,7 @@ const BookShipment = () => {
 
       console.log("Sending booking:", bookingBody);
 
-      const response = await fetch("http://localhost:5000/api/bookings", {
+      const response = await fetch(`${API_URL}/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -331,6 +334,39 @@ const BookShipment = () => {
         throw new Error(data.message || "Failed to create booking");
       }
 
+      /* =========================================
+         REAL PAYMENT
+         If the customer chose Card or Bank Transfer,
+         send them to Flutterwave's real checkout instead
+         of faking a success screen. Pay on Delivery skips
+         straight to the success screen since no online
+         payment is needed.
+      ========================================= */
+
+      const chosenMethod = paymentMethodMap[payment.method] || "CARD";
+
+      if (chosenMethod !== "PAY_ON_DELIVERY") {
+        const paymentResponse = await fetch(`${API_URL}/payments/initiate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ bookingId: data.booking.id }),
+        });
+
+        const paymentData = await paymentResponse.json();
+
+        if (!paymentResponse.ok || !paymentData.success || !paymentData.link) {
+          throw new Error(
+            paymentData.message || "Failed to start payment. Please try again.",
+          );
+        }
+
+        window.location.href = paymentData.link;
+        return;
+      }
+
       setTrackingId(data.booking.shipment.trackingNumber);
 
       setCreatingShipment(false);
@@ -339,6 +375,8 @@ const BookShipment = () => {
       console.error("Booking creation error:", error);
 
       setCreatingShipment(false);
+
+      alert(error.message || "Unable to create shipment. Please try again.");
     }
   };
   /* =========================================
@@ -1157,7 +1195,8 @@ const BookShipment = () => {
                   </button>
 
                   <p className="payment-demo-note">
-                    Demo payment — no real charge will be made.
+                    You'll be redirected to a secure Flutterwave checkout page
+                    to complete your payment.
                   </p>
                 </div>
               </div>

@@ -1,12 +1,14 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const isAuthenticated =
-    localStorage.getItem("lordtaylor-auth") ||
-    sessionStorage.getItem("lordtaylor-auth");
+  const location = useLocation();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  const token =
+    localStorage.getItem("lordtaylor-token") ||
+    sessionStorage.getItem("lordtaylor-token");
+
+  if (!token) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   return children;

@@ -14,42 +14,153 @@ import {
   FaCreditCard,
 } from "react-icons/fa6";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const PAYMENT_METHODS = {
+  "Pay on Delivery": "PAY_ON_DELIVERY",
+  "Card Payment": "CARD",
+  "Bank Transfer": "BANK_TRANSFER",
+};
+
+const SERVICE_OPTIONS = {
+  Standard: "Standard",
+  Express: "Express",
+  "Priority Express": "Express",
+};
+
+const calculateShippingCost = (weight, service) => {
+  const numericWeight = Number(weight) || 0;
+
+  const baseCost = numericWeight * 18;
+
+  const serviceFee =
+    service === "Priority Express" ? 80 : service === "Express" ? 40 : 15;
+
+  return baseCost + serviceFee;
+};
+
 const BookShipment = () => {
   const [booking, setBooking] = useState({
     senderName: "",
-
     senderPhone: "",
-
     senderEmail: "",
-
     receiverName: "",
-
     receiverPhone: "",
-
     pickup: "",
-
     destination: "",
-
     packageType: "Parcel",
-
     weight: "5",
-
     pickupDate: "",
-
     service: "Express",
-
     payment: "Pay on Delivery",
   });
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdBooking, setCreatedBooking] = useState(null);
 
-  const handleChange = (e) => {
-    setBooking({
-      ...booking,
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setBooking((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    setError("");
   };
+
+  const handleConfirmBooking = async () => {
+    setError("");
+
+    const token =
+      localStorage.getItem("lordtaylor-token") ||
+      sessionStorage.getItem("lordtaylor-token");
+
+    if (!token) {
+      setError("Your session has expired. Please sign in again.");
+      return;
+    }
+
+    if (
+      !booking.senderName.trim() ||
+      !booking.receiverName.trim() ||
+      !booking.pickup.trim() ||
+      !booking.destination.trim()
+    ) {
+      setError(
+        "Please complete the sender, receiver, pickup, and destination details.",
+      );
+      return;
+    }
+
+    const weight = Number(booking.weight);
+
+    if (!weight || weight <= 0) {
+      setError("Please enter a valid shipment weight.");
+      return;
+    }
+
+    const estimatedCost = calculateShippingCost(weight, booking.service);
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          senderName: booking.senderName.trim(),
+          senderPhone: booking.senderPhone.trim(),
+          senderEmail: booking.senderEmail.trim(),
+
+          receiverName: booking.receiverName.trim(),
+          receiverPhone: booking.receiverPhone.trim(),
+
+          pickup: booking.pickup.trim(),
+          destination: booking.destination.trim(),
+
+          packageType: booking.packageType,
+          weight,
+
+          pickupDate: booking.pickupDate || null,
+
+          service: SERVICE_OPTIONS[booking.service] || "Standard",
+
+          paymentMethod: PAYMENT_METHODS[booking.payment] || "PAY_ON_DELIVERY",
+
+          estimatedCost,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Unable to create your shipment booking.",
+        );
+      }
+
+      setCreatedBooking(data.booking);
+      setShowSuccessModal(true);
+    } catch (bookingError) {
+      console.error("Booking error:", bookingError);
+
+      setError(
+        bookingError.message ||
+          "Unable to create your shipment. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const estimatedCost = calculateShippingCost(booking.weight, booking.service);
 
   return (
     <section className="booking-page">
@@ -74,6 +185,8 @@ const BookShipment = () => {
             everything before confirming your shipment.
           </p>
         </motion.div>
+
+        {error && <div className="booking-error">{error}</div>}
 
         <div className="booking-layout">
           <motion.div
@@ -130,8 +243,6 @@ const BookShipment = () => {
               </div>
             </div>
 
-            <div className="section-title">Receiver Information</div>
-
             <div className="field">
               <label>
                 <FaUser />
@@ -141,7 +252,7 @@ const BookShipment = () => {
               <input
                 type="text"
                 name="receiverName"
-                placeholder="Receiver Name"
+                placeholder="James Taylor"
                 value={booking.receiverName}
                 onChange={handleChange}
               />
@@ -156,7 +267,7 @@ const BookShipment = () => {
               <input
                 type="text"
                 name="receiverPhone"
-                placeholder="+234..."
+                placeholder="+44 7123 456789"
                 value={booking.receiverPhone}
                 onChange={handleChange}
               />
@@ -166,13 +277,13 @@ const BookShipment = () => {
               <div className="field">
                 <label>
                   <FaLocationDot />
-                  Pickup location
+                  Pickup Location
                 </label>
 
                 <input
                   type="text"
                   name="pickup"
-                  placeholder="London, UK"
+                  placeholder="Lagos, Nigeria"
                   value={booking.pickup}
                   onChange={handleChange}
                 />
@@ -181,13 +292,13 @@ const BookShipment = () => {
               <div className="field">
                 <label>
                   <FaLocationDot />
-                  Delivery location
+                  Destination
                 </label>
 
                 <input
                   type="text"
                   name="destination"
-                  placeholder="Lagos, Nigeria"
+                  placeholder="London, United Kingdom"
                   value={booking.destination}
                   onChange={handleChange}
                 />
@@ -206,23 +317,25 @@ const BookShipment = () => {
                   value={booking.packageType}
                   onChange={handleChange}
                 >
-                  <option>Documents</option>
-
                   <option>Parcel</option>
-
+                  <option>Document</option>
                   <option>Electronics</option>
-
-                  <option>Commercial Cargo</option>
+                  <option>Personal Items</option>
+                  <option>Other</option>
                 </select>
               </div>
 
               <div className="field">
-                <label>Weight (KG)</label>
+                <label>
+                  <FaBoxOpen />
+                  Weight (KG)
+                </label>
 
                 <input
                   type="number"
-                  min="1"
                   name="weight"
+                  min="0.1"
+                  step="0.1"
                   value={booking.weight}
                   onChange={handleChange}
                 />
@@ -256,9 +369,7 @@ const BookShipment = () => {
                   onChange={handleChange}
                 >
                   <option>Standard</option>
-
                   <option>Express</option>
-
                   <option>Priority Express</option>
                 </select>
               </div>
@@ -276,13 +387,12 @@ const BookShipment = () => {
                 onChange={handleChange}
               >
                 <option>Pay on Delivery</option>
-
                 <option>Card Payment</option>
-
                 <option>Bank Transfer</option>
               </select>
             </div>
           </motion.div>
+
           <motion.div
             className="booking-summary"
             initial={{ opacity: 0, x: 40 }}
@@ -355,26 +465,19 @@ const BookShipment = () => {
             <div className="booking-price">
               <h3>Estimated Shipping Cost</h3>
 
-              <h1>
-                £
-                {Number(booking.weight) * 18 +
-                  (booking.service === "Priority Express"
-                    ? 80
-                    : booking.service === "Express"
-                      ? 40
-                      : 15)}
-              </h1>
+              <h1>£{estimatedCost}</h1>
 
               <p>Final cost will be confirmed after package inspection.</p>
             </div>
 
             <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: loading ? 1 : 1.03 }}
+              whileTap={{ scale: loading ? 1 : 0.97 }}
               className="confirm-booking-btn"
-              onClick={() => setShowSuccessModal(true)}
+              onClick={handleConfirmBooking}
+              disabled={loading}
             >
-              Confirm Booking
+              {loading ? "Creating Shipment..." : "Confirm Booking"}
             </motion.button>
           </motion.div>
         </div>
@@ -383,7 +486,7 @@ const BookShipment = () => {
       <BookingSuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        booking={booking}
+        booking={createdBooking || booking}
       />
     </section>
   );

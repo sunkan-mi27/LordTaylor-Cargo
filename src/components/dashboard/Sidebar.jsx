@@ -1,17 +1,19 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import {
   FaChartLine,
   FaBox,
   FaLocationDot,
-  FaFileInvoiceDollar,
   FaClockRotateLeft,
+  FaBell,
   FaUser,
   FaGear,
   FaArrowRightFromBracket,
 } from "react-icons/fa6";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
   const menu = [
     {
       title: "Dashboard",
@@ -34,6 +36,11 @@ const Sidebar = () => {
       path: "/history",
     },
     {
+      title: "Notifications",
+      icon: <FaBell />,
+      path: "/notifications",
+    },
+    {
       title: "Profile",
       icon: <FaUser />,
       path: "/profile",
@@ -44,6 +51,18 @@ const Sidebar = () => {
       path: "/settings",
     },
   ];
+
+  const handleLogout = () => {
+    // Remove authentication data
+    localStorage.removeItem("lordtaylor-token");
+    localStorage.removeItem("lordtaylor-user");
+
+    sessionStorage.removeItem("lordtaylor-token");
+    sessionStorage.removeItem("lordtaylor-user");
+
+    // Send customer back to login
+    navigate("/login", { replace: true });
+  };
 
   return (
     <aside className="sidebar">
@@ -72,7 +91,7 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="logout-btn">
+        <button type="button" className="logout-btn" onClick={handleLogout}>
           <FaArrowRightFromBracket />
           Logout
         </button>

@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma.js";
+import { notifyUser } from "../utils/notify.js";
 
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -60,6 +61,13 @@ export const register = async (req, res) => {
     });
 
     const token = generateToken(user.id);
+
+    await notifyUser(
+      user.id,
+      "Welcome to LordTaylor Cargo",
+      "Your account has been created successfully. Start booking your first shipment today.",
+      { link: "/dashboard" },
+    );
 
     return res.status(201).json({
       success: true,

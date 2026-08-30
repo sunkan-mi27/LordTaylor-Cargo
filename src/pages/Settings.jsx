@@ -1,31 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import "../styles/settings.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const getAuthToken = () => {
+  return (
+    localStorage.getItem("lordtaylor-token") ||
+    sessionStorage.getItem("lordtaylor-token")
+  );
+};
+
 export default function Settings() {
   /* =========================================================
-     NOTIFICATIONS
+     SETTINGS STATE
   ========================================================= */
 
-  const [notifications, setNotifications] = useState({
+  const [settings, setSettings] = useState({
     shipmentUpdates: true,
     deliveryAlerts: true,
     promotionalEmails: false,
-  });
-
-  /* =========================================================
-     DISPLAY
-  ========================================================= */
-
-  const [display, setDisplay] = useState({
     language: "English",
     timezone: "West Africa Time (WAT)",
     theme: "Dark",
   });
 
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+
   /* =========================================================
      PAYMENT METHODS
+     ---------------------------------------------------------
+     Payment methods are still local UI for now.
+     They are NOT sent to the UserSettings API because your
+     current Prisma UserSettings model does not contain them.
   ========================================================= */
 
   const [paymentMethods, setPaymentMethods] = useState([
@@ -57,37 +69,163 @@ export default function Settings() {
   });
 
   /* =========================================================
-     SAVE STATE
+     FETCH SETTINGS
   ========================================================= */
 
-  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const token = getAuthToken();
+
+      if (!token) {
+        setError("Your session has expired. Please sign in again.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/settings/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+          localStorage.removeItem("lordtaylor-token");
+          sessionStorage.removeItem("lordtaylor-token");
+
+          setError("Your session has expired. Please sign in again.");
+          return;
+        }
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Unable to load your settings.");
+        }
+
+        setSettings({
+          shipmentUpdates: data.settings.shipmentUpdates,
+          deliveryAlerts: data.settings.deliveryAlerts,
+          promotionalEmails: data.settings.promotionalEmails,
+          language: data.settings.language,
+          timezone: data.settings.timezone,
+          theme: data.settings.theme,
+        });
+      } catch (err) {
+        console.error("Fetch settings error:", err);
+
+        setError(
+          err.message || "Unable to load your settings. Please try again.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   /* =========================================================
-     HANDLERS
+     NOTIFICATION HANDLER
   ========================================================= */
 
   const toggleNotification = (name) => {
-    setNotifications((previous) => ({
+    setSettings((previous) => ({
       ...previous,
       [name]: !previous[name],
     }));
+
+    setSaved(false);
+    setError("");
   };
+
+  /* =========================================================
+     DISPLAY HANDLER
+  ========================================================= */
 
   const handleDisplayChange = (event) => {
     const { name, value } = event.target;
 
-    setDisplay((previous) => ({
+    setSettings((previous) => ({
       ...previous,
       [name]: value,
     }));
+
+    setSaved(false);
+    setError("");
   };
 
-  const handleSave = () => {
-    setSaved(true);
+  /* =========================================================
+     SAVE SETTINGS
+  ========================================================= */
 
-    window.setTimeout(() => {
-      setSaved(false);
-    }, 3000);
+  const handleSave = async () => {
+    const token = getAuthToken();
+
+    if (!token) {
+      setError("Your session has expired. Please sign in again.");
+      return;
+    }
+
+    setSaving(true);
+    setSaved(false);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_URL}/settings/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          shipmentUpdates: settings.shipmentUpdates,
+          deliveryAlerts: settings.deliveryAlerts,
+          promotionalEmails: settings.promotionalEmails,
+          language: settings.language,
+          timezone: settings.timezone,
+          theme: settings.theme,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 401) {
+        localStorage.removeItem("lordtaylor-token");
+        sessionStorage.removeItem("lordtaylor-token");
+
+        setError("Your session has expired. Please sign in again.");
+        return;
+      }
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Unable to save your settings.");
+      }
+
+      setSettings({
+        shipmentUpdates: data.settings.shipmentUpdates,
+        deliveryAlerts: data.settings.deliveryAlerts,
+        promotionalEmails: data.settings.promotionalEmails,
+        language: data.settings.language,
+        timezone: data.settings.timezone,
+        theme: data.settings.theme,
+      });
+
+      setSaved(true);
+
+      window.setTimeout(() => {
+        setSaved(false);
+      }, 3000);
+    } catch (err) {
+      console.error("Save settings error:", err);
+
+      setError(
+        err.message || "Something went wrong while saving your settings.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   /* =========================================================
@@ -158,6 +296,37 @@ export default function Settings() {
     });
   };
 
+  /* =========================================================
+     LOADING STATE
+  ========================================================= */
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <main className="settings-page">
+          <section className="settings-page-header">
+            <div>
+              <span className="settings-kicker">ACCOUNT PREFERENCES</span>
+
+              <h1>Settings</h1>
+
+              <p>Loading your account preferences...</p>
+            </div>
+          </section>
+
+          <div className="settings-loading">
+            <div className="settings-loading-spinner" />
+            <p>Loading settings...</p>
+          </div>
+        </main>
+      </DashboardLayout>
+    );
+  }
+
+  /* =========================================================
+     PAGE
+  ========================================================= */
+
   return (
     <DashboardLayout>
       <main className="settings-page">
@@ -177,10 +346,30 @@ export default function Settings() {
             </p>
           </div>
 
-          <button className="settings-save-button" onClick={handleSave}>
-            Save Changes
+          <button
+            className="settings-save-button"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </section>
+
+        {/* =====================================================
+            ERROR NOTICE
+        ===================================================== */}
+
+        {error && (
+          <div className="settings-error-notice">
+            <span>!</span>
+
+            <div>
+              <strong>Something went wrong</strong>
+
+              <p>{error}</p>
+            </div>
+          </div>
+        )}
 
         {/* =====================================================
             SAVE NOTICE
@@ -230,7 +419,7 @@ export default function Settings() {
               <button
                 type="button"
                 className={`settings-toggle ${
-                  notifications.shipmentUpdates ? "active" : ""
+                  settings.shipmentUpdates ? "active" : ""
                 }`}
                 onClick={() => toggleNotification("shipmentUpdates")}
                 aria-label="Toggle shipment updates"
@@ -253,7 +442,7 @@ export default function Settings() {
               <button
                 type="button"
                 className={`settings-toggle ${
-                  notifications.deliveryAlerts ? "active" : ""
+                  settings.deliveryAlerts ? "active" : ""
                 }`}
                 onClick={() => toggleNotification("deliveryAlerts")}
                 aria-label="Toggle delivery alerts"
@@ -276,7 +465,7 @@ export default function Settings() {
               <button
                 type="button"
                 className={`settings-toggle ${
-                  notifications.promotionalEmails ? "active" : ""
+                  settings.promotionalEmails ? "active" : ""
                 }`}
                 onClick={() => toggleNotification("promotionalEmails")}
                 aria-label="Toggle promotional emails"
@@ -315,7 +504,7 @@ export default function Settings() {
               <select
                 id="language"
                 name="language"
-                value={display.language}
+                value={settings.language}
                 onChange={handleDisplayChange}
               >
                 <option>English</option>
@@ -330,7 +519,7 @@ export default function Settings() {
               <select
                 id="timezone"
                 name="timezone"
-                value={display.timezone}
+                value={settings.timezone}
                 onChange={handleDisplayChange}
               >
                 <option>West Africa Time (WAT)</option>
@@ -354,17 +543,15 @@ export default function Settings() {
             </div>
 
             <select
-              value={display.theme}
-              onChange={(event) =>
-                setDisplay((previous) => ({
-                  ...previous,
-                  theme: event.target.value,
-                }))
-              }
+              name="theme"
+              value={settings.theme}
+              onChange={handleDisplayChange}
               className="settings-field-select"
             >
               <option>Dark</option>
+
               <option>Light</option>
+
               <option>System</option>
             </select>
           </div>
@@ -579,6 +766,7 @@ export default function Settings() {
                     onChange={handlePaymentChange}
                   >
                     <option>Visa</option>
+
                     <option>Mastercard</option>
                   </select>
                 </div>
@@ -658,9 +846,9 @@ export default function Settings() {
               <strong>Payment security</strong>
 
               <p>
-                Your payment details are only represented here for portal
-                settings. Real payment processing will be connected securely
-                during backend integration.
+                Your payment details are currently represented locally in this
+                portal. Real payment processing will be connected securely
+                during the payment integration phase.
               </p>
             </div>
           </div>

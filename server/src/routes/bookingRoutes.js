@@ -16,10 +16,4 @@ router.get("/history", authMiddleware, getBookingHistory);
 router.get("/track/:trackingNumber", trackShipment);
 router.get("/dashboard", authMiddleware, getDashboardData);
 
-router.patch(
-  "/shipments/:trackingNumber/status",
-  authMiddleware,
-  updateShipmentStatus,
-);
-
 export default router;

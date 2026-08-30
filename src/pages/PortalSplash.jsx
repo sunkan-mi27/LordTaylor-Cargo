@@ -11,7 +11,22 @@ const PortalSplash = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate("/dashboard", { replace: true });
+      try {
+        const savedUser =
+          localStorage.getItem("lordtaylor-user") ||
+          sessionStorage.getItem("lordtaylor-user");
+
+        const user = savedUser ? JSON.parse(savedUser) : null;
+
+        if (user?.role === "ADMIN") {
+          navigate("/admin/dashboard", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      } catch (error) {
+        console.error("Failed to read stored user:", error);
+        navigate("/dashboard", { replace: true });
+      }
     }, 3200);
 
     return () => clearTimeout(timer);

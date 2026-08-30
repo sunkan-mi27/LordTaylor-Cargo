@@ -15,6 +15,8 @@ import {
 import "./TrackShipment.css";
 import TrackEmptyState from "./TrackEmptyState";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const STATUS_ORDER = ["BOOKED", "PROCESSING", "IN_TRANSIT", "DELIVERED"];
 
 const STATUS_LABELS = {
@@ -126,9 +128,7 @@ const TrackShipment = () => {
     setSearchComplete(false);
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/bookings/track/${searchValue}`,
-      );
+      const response = await fetch(`${API_URL}/bookings/track/${searchValue}`);
 
       const data = await response.json();
 

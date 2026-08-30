@@ -8,6 +8,8 @@ import ShipmentCard from "../components/ShipmentCard";
 
 import "../styles/shipment-history.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 export default function ShipmentHistory() {
   const [shipments, setShipments] = useState([]);
   const [selectedShipment, setSelectedShipment] = useState(null);
@@ -30,15 +32,12 @@ export default function ShipmentHistory() {
         throw new Error("Authentication required. Please log in again.");
       }
 
-      const response = await fetch(
-        "http://localhost:5000/api/bookings/history",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${API_URL}/bookings/history`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
 

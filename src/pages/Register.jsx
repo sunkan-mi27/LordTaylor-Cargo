@@ -12,6 +12,8 @@ import {
 } from "react-icons/fa";
 import "../styles/register.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const Register = () => {
   const navigate = useNavigate();
 
@@ -52,7 +54,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,9 +77,7 @@ const Register = () => {
 
       // Store the JWT returned by the backend
       localStorage.setItem("lordtaylor-token", data.token);
-
-      // Keep the existing auth flag for the current frontend flow
-      localStorage.setItem("lordtaylor-auth", "true");
+      localStorage.setItem("lordtaylor-user", JSON.stringify(data.user));
 
       navigate("/portal-loading");
     } catch (error) {
