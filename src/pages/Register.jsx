@@ -122,7 +122,6 @@ const Register = () => {
                 <input
                   type="text"
                   name="firstName"
-                  placeholder="John"
                   value={form.firstName}
                   onChange={handleChange}
                   autoComplete="given-name"
@@ -140,7 +139,6 @@ const Register = () => {
                 <input
                   type="text"
                   name="lastName"
-                  placeholder="David"
                   value={form.lastName}
                   onChange={handleChange}
                   autoComplete="family-name"
@@ -159,7 +157,6 @@ const Register = () => {
               <input
                 type="email"
                 name="email"
-                placeholder="john@email.com"
                 value={form.email}
                 onChange={handleChange}
                 autoComplete="email"
@@ -177,7 +174,6 @@ const Register = () => {
               <input
                 type="tel"
                 name="phone"
-                placeholder="+44 7123 456789"
                 value={form.phone}
                 onChange={handleChange}
                 autoComplete="tel"
@@ -195,7 +191,6 @@ const Register = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="••••••••"
                 value={form.password}
                 onChange={handleChange}
                 autoComplete="new-password"
@@ -221,7 +216,6 @@ const Register = () => {
               <input
                 type={showConfirm ? "text" : "password"}
                 name="confirmPassword"
-                placeholder="••••••••"
                 value={form.confirmPassword}
                 onChange={handleChange}
                 autoComplete="new-password"

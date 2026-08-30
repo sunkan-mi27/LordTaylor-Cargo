@@ -95,7 +95,6 @@ const Login = () => {
               <input
                 type="email"
                 name="email"
-                placeholder="john@email.com"
                 value={form.email}
                 onChange={handleChange}
                 autoComplete="email"
@@ -113,7 +112,6 @@ const Login = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="••••••••"
                 value={form.password}
                 onChange={handleChange}
                 autoComplete="current-password"
