@@ -532,7 +532,6 @@ const BookShipment = () => {
                     name="fullName"
                     value={sender.fullName}
                     onChange={handleSenderChange}
-                    placeholder="John Smith"
                     className={errors.fullName ? "input-error" : ""}
                     autoComplete="name"
                   />
@@ -550,7 +549,6 @@ const BookShipment = () => {
                     name="email"
                     value={sender.email}
                     onChange={handleSenderChange}
-                    placeholder="john@email.com"
                     className={errors.email ? "input-error" : ""}
                     autoComplete="email"
                   />
@@ -568,7 +566,6 @@ const BookShipment = () => {
                     name="phone"
                     value={sender.phone}
                     onChange={handleSenderChange}
-                    placeholder="+44 7000 000000"
                     className={errors.phone ? "input-error" : ""}
                     autoComplete="tel"
                   />
@@ -600,7 +597,6 @@ const BookShipment = () => {
                     name="state"
                     value={sender.state}
                     onChange={handleSenderChange}
-                    placeholder="Greater London"
                   />
                 </div>
 
@@ -612,7 +608,6 @@ const BookShipment = () => {
                     name="city"
                     value={sender.city}
                     onChange={handleSenderChange}
-                    placeholder="London"
                   />
                 </div>
 
@@ -624,7 +619,6 @@ const BookShipment = () => {
                     name="postalCode"
                     value={sender.postalCode}
                     onChange={handleSenderChange}
-                    placeholder="SW1A 1AA"
                     autoComplete="postal-code"
                   />
                 </div>
@@ -671,7 +665,6 @@ const BookShipment = () => {
                     name="fullName"
                     value={receiver.fullName}
                     onChange={handleReceiverChange}
-                    placeholder="Jane Doe"
                     className={errors.receiverName ? "input-error" : ""}
                     autoComplete="name"
                   />
@@ -689,7 +682,6 @@ const BookShipment = () => {
                     name="email"
                     value={receiver.email}
                     onChange={handleReceiverChange}
-                    placeholder="jane@email.com"
                     className={errors.receiverEmail ? "input-error" : ""}
                     autoComplete="email"
                   />
@@ -707,7 +699,6 @@ const BookShipment = () => {
                     name="phone"
                     value={receiver.phone}
                     onChange={handleReceiverChange}
-                    placeholder="+234 800 000 0000"
                     className={errors.receiverPhone ? "input-error" : ""}
                     autoComplete="tel"
                   />
@@ -739,7 +730,6 @@ const BookShipment = () => {
                     name="state"
                     value={receiver.state}
                     onChange={handleReceiverChange}
-                    placeholder="Lagos"
                   />
                 </div>
 
@@ -751,7 +741,6 @@ const BookShipment = () => {
                     name="city"
                     value={receiver.city}
                     onChange={handleReceiverChange}
-                    placeholder="Lekki"
                   />
                 </div>
 
@@ -763,7 +752,6 @@ const BookShipment = () => {
                     name="postalCode"
                     value={receiver.postalCode}
                     onChange={handleReceiverChange}
-                    placeholder="101233"
                     autoComplete="postal-code"
                   />
                 </div>

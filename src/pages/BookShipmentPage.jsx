@@ -144,7 +144,6 @@ const BookShipmentPage = () => {
                 <input
                   type="text"
                   name="senderName"
-                  placeholder="John Doe"
                   value={booking.senderName}
                   onChange={handleChange}
                 />
@@ -160,7 +159,6 @@ const BookShipmentPage = () => {
                 <input
                   type="tel"
                   name="senderPhone"
-                  placeholder="+44 7123 456789"
                   value={booking.senderPhone}
                   onChange={handleChange}
                 />
@@ -180,7 +178,6 @@ const BookShipmentPage = () => {
                 <input
                   type="text"
                   name="receiverName"
-                  placeholder="Mary James"
                   value={booking.receiverName}
                   onChange={handleChange}
                 />
@@ -196,7 +193,6 @@ const BookShipmentPage = () => {
                 <input
                   type="tel"
                   name="receiverPhone"
-                  placeholder="+234 801 234 5678"
                   value={booking.receiverPhone}
                   onChange={handleChange}
                 />
@@ -214,7 +210,6 @@ const BookShipmentPage = () => {
               <input
                 type="text"
                 name="pickup"
-                placeholder="London, United Kingdom"
                 value={booking.pickup}
                 onChange={handleChange}
               />
@@ -230,7 +225,6 @@ const BookShipmentPage = () => {
               <input
                 type="text"
                 name="destination"
-                placeholder="Lagos, Nigeria"
                 value={booking.destination}
                 onChange={handleChange}
               />
