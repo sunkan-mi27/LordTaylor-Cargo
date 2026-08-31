@@ -1,9 +1,27 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { FaCircleCheck, FaUser, FaGear, FaArrowRight } from "react-icons/fa6";
+import {
+  FaCircleCheck,
+  FaUser,
+  FaGear,
+  FaArrowRight,
+  FaArrowRightFromBracket,
+} from "react-icons/fa6";
 
 const AccountSnapshot = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("lordtaylor-token");
+    localStorage.removeItem("lordtaylor-user");
+
+    sessionStorage.removeItem("lordtaylor-token");
+    sessionStorage.removeItem("lordtaylor-user");
+
+    navigate("/login", { replace: true });
+  };
+
   const storedUser =
     localStorage.getItem("lordtaylor-user") ||
     sessionStorage.getItem("lordtaylor-user");
@@ -86,10 +104,21 @@ const AccountSnapshot = () => {
         </Link>
       </div>
 
-      <Link to="/profile" className="manage-account">
-        Manage Account
-        <FaArrowRight />
-      </Link>
+      <div className="manage-account-row">
+        <Link to="/profile" className="manage-account">
+          Manage Account
+          <FaArrowRight />
+        </Link>
+
+        <button
+          type="button"
+          className="manage-account-logout"
+          onClick={handleLogout}
+        >
+          Logout
+          <FaArrowRightFromBracket />
+        </button>
+      </div>
     </motion.section>
   );
 };

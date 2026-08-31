@@ -109,8 +109,6 @@ const TrustSection = () => {
               <p>{card.text}</p>
 
               <div className="trust-footer">
-                <span>Learn More</span>
-
                 <FaArrowRight />
               </div>
 

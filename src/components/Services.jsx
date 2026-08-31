@@ -111,11 +111,6 @@ const Services = () => {
               ))}
             </div>
 
-            <button className="service-btn">
-              Learn More
-              <FaArrowRight />
-            </button>
-
             <div className="service-bg-animation"></div>
           </motion.div>
 
@@ -153,11 +148,6 @@ const Services = () => {
                     </div>
                   ))}
                 </div>
-
-                <button className="service-btn">
-                  Explore
-                  <FaArrowRight />
-                </button>
 
                 <div className="service-bg-animation"></div>
               </motion.div>

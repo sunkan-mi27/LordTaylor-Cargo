@@ -484,56 +484,6 @@
   transform: scale(1.2);
 }
 /*==========================================
-  BUTTONS
-==========================================*/
-
-.service-btn {
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 12px;
-
-  padding: 16px 28px;
-
-  border: none;
-
-  border-radius: 18px;
-
-  cursor: pointer;
-
-  font-size: 15px;
-
-  font-weight: 700;
-
-  color: #fff;
-
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
-
-  box-shadow: 0 20px 45px rgba(14, 165, 233, 0.28);
-
-  transition: 0.35s ease;
-
-  margin-top: auto;
-}
-
-.service-btn:hover {
-  transform: translateY(-5px);
-
-  box-shadow: 0 30px 65px rgba(14, 165, 233, 0.42);
-}
-
-.service-btn svg {
-  transition: 0.35s;
-}
-
-.service-btn:hover svg {
-  transform: translateX(8px);
-}
-
-/*==========================================
   HOVER OVERLAY
 ==========================================*/
 
@@ -637,12 +587,6 @@
 
     font-size: 28px;
   }
-
-  .service-btn {
-    width: 100%;
-
-    justify-content: center;
-  }
 }
 
 /*==========================================
@@ -650,13 +594,11 @@
 ==========================================*/
 
 .service-card,
-.service-btn,
 .feature {
   will-change: transform;
 }
 
 .service-card,
-.service-btn,
 .feature {
   transition:
     transform 0.35s ease,

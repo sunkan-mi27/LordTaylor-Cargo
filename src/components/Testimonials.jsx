@@ -134,11 +134,6 @@ const Testimonials = () => {
 
               <div className="testimonial-footer">
                 <span>{testimonial.country}</span>
-
-                <button>
-                  Read Story
-                  <FaArrowRight />
-                </button>
               </div>
 
               <div className="testimonial-glow"></div>
