@@ -168,7 +168,11 @@ const LiveShipment = () => {
             <div className="cargo-card">
               <h4>Current Cargo</h4>
 
-              <strong>Apple MacBook Pro Package</strong>
+              <strong>Dry Fish🦈</strong>
+              <br />
+              <strong>Honey🍯</strong>
+              <br />
+              <strong>& All Proteins🛡📦</strong>
             </div>
 
             <div className="status-grid">
