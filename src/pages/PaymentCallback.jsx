@@ -96,9 +96,9 @@ const PaymentCallback = () => {
             <button
               type="button"
               className="payment-callback-button"
-              onClick={() => navigate("/history")}
+              onClick={() => navigate("/dashboard")}
             >
-              View My Bookings
+              Go to Dashboard
             </button>
           </>
         )}
@@ -116,9 +116,9 @@ const PaymentCallback = () => {
             <button
               type="button"
               className="payment-callback-button"
-              onClick={() => navigate("/history")}
+              onClick={() => navigate("/dashboard")}
             >
-              View My Bookings
+              Go to Dashboard
             </button>
           </>
         )}

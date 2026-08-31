@@ -154,6 +154,10 @@ const Topbar = () => {
   }, []);
 
   const handleBellClick = () => {
+    if (window.innerWidth <= 640) {
+      navigate("/notifications");
+      return;
+    }
     setNotifOpen((prev) => !prev);
   };
 

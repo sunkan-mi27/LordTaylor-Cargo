@@ -14,11 +14,33 @@ import "../../styles/adminShipments.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+const STATUS_ORDER = ["BOOKED", "PROCESSING", "IN_TRANSIT", "DELIVERED"];
+
+const getNextOptions = (currentStatus) => {
+  const index = STATUS_ORDER.indexOf(currentStatus);
+
+  if (
+    index === -1 ||
+    currentStatus === "DELIVERED" ||
+    currentStatus === "CANCELLED"
+  ) {
+    return [];
+  }
+
+  const forwardOptions = STATUS_ORDER.slice(index + 1);
+
+  return [...forwardOptions, "CANCELLED"];
+};
+
 const AdminShipments = () => {
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
+
+  const [pendingStatus, setPendingStatus] = useState({});
+  const [updatingTracking, setUpdatingTracking] = useState(null);
+  const [updateError, setUpdateError] = useState({});
 
   const getToken = () => {
     return (
@@ -41,8 +63,6 @@ const AdminShipments = () => {
 
       const data = await response.json();
 
-      console.log("Admin shipments response:", data);
-
       if (!response.ok || !data.success) {
         throw new Error(data.message || "Failed to load shipments");
       }
@@ -58,6 +78,59 @@ const AdminShipments = () => {
   useEffect(() => {
     loadShipments();
   }, []);
+
+  const handleUpdateStatus = async (trackingNumber) => {
+    const nextStatus = pendingStatus[trackingNumber];
+
+    if (!nextStatus) return;
+
+    try {
+      setUpdatingTracking(trackingNumber);
+      setUpdateError((prev) => ({ ...prev, [trackingNumber]: "" }));
+
+      const token = getToken();
+
+      const response = await fetch(
+        `${API_URL}/admin/shipments/${trackingNumber}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: nextStatus }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to update shipment status");
+      }
+
+      setShipments((prev) =>
+        prev.map((s) =>
+          s.trackingNumber === trackingNumber
+            ? { ...s, status: nextStatus }
+            : s,
+        ),
+      );
+
+      setPendingStatus((prev) => {
+        const next = { ...prev };
+        delete next[trackingNumber];
+        return next;
+      });
+    } catch (error) {
+      console.error("Update shipment status error:", error);
+      setUpdateError((prev) => ({
+        ...prev,
+        [trackingNumber]: error.message || "Failed to update status",
+      }));
+    } finally {
+      setUpdatingTracking(null);
+    }
+  };
 
   const filteredShipments = shipments.filter((shipment) => {
     const matchesStatus = status === "ALL" || shipment.status === status;
@@ -146,6 +219,7 @@ const AdminShipments = () => {
           onChange={(event) => setStatus(event.target.value)}
         >
           <option value="ALL">All Statuses</option>
+          <option value="BOOKED">Booked</option>
           <option value="PROCESSING">Processing</option>
           <option value="IN_TRANSIT">In Transit</option>
           <option value="DELIVERED">Delivered</option>
@@ -184,56 +258,113 @@ const AdminShipments = () => {
               <span>PACKAGE</span>
               <span>STATUS</span>
               <span>VALUE</span>
+              <span>UPDATE</span>
             </div>
 
-            {filteredShipments.map((shipment) => (
-              <div className="admin-table-row" key={shipment.id}>
-                <div className="shipment-identity">
-                  <div className="shipment-icon">
-                    <FaBox />
+            {filteredShipments.map((shipment) => {
+              const nextOptions = getNextOptions(shipment.status);
+              const isTerminal = nextOptions.length === 0;
+              const isUpdatingThis =
+                updatingTracking === shipment.trackingNumber;
+
+              return (
+                <div className="admin-table-row" key={shipment.id}>
+                  <div className="shipment-identity">
+                    <div className="shipment-icon">
+                      <FaBox />
+                    </div>
+
+                    <div>
+                      <strong>
+                        {shipment.trackingNumber || "No tracking ID"}
+                      </strong>
+
+                      <span>{shipment.id}</span>
+                    </div>
+                  </div>
+
+                  <div className="shipment-route">
+                    <strong>{shipment.senderName || "Unknown sender"}</strong>
+
+                    <span>→</span>
+
+                    <strong>
+                      {shipment.receiverName || "Unknown receiver"}
+                    </strong>
+                  </div>
+
+                  <div className="shipment-package">
+                    <strong>{shipment.packageType || "Standard"}</strong>
+
+                    <span>{shipment.weight ?? 0} kg</span>
                   </div>
 
                   <div>
-                    <strong>
-                      {shipment.trackingNumber || "No tracking ID"}
-                    </strong>
+                    <span
+                      className={`shipment-status status-${shipment.status?.toLowerCase()}`}
+                    >
+                      {getStatusIcon(shipment.status)}
 
-                    <span>{shipment.id}</span>
+                      {formatStatus(shipment.status)}
+                    </span>
+                  </div>
+
+                  <div className="shipment-value">
+                    £
+                    {Number(
+                      shipment.estimatedCost || shipment.cost || 0,
+                    ).toFixed(2)}
+                  </div>
+
+                  <div className="shipment-update">
+                    {isTerminal ? (
+                      <span className="shipment-update-terminal">—</span>
+                    ) : (
+                      <>
+                        <div className="shipment-update-row">
+                          <select
+                            value={pendingStatus[shipment.trackingNumber] || ""}
+                            onChange={(event) =>
+                              setPendingStatus((prev) => ({
+                                ...prev,
+                                [shipment.trackingNumber]: event.target.value,
+                              }))
+                            }
+                          >
+                            <option value="">Set status...</option>
+                            {nextOptions.map((option) => (
+                              <option key={option} value={option}>
+                                {formatStatus(option)}
+                              </option>
+                            ))}
+                          </select>
+
+                          <button
+                            type="button"
+                            className="shipment-update-button"
+                            disabled={
+                              !pendingStatus[shipment.trackingNumber] ||
+                              isUpdatingThis
+                            }
+                            onClick={() =>
+                              handleUpdateStatus(shipment.trackingNumber)
+                            }
+                          >
+                            {isUpdatingThis ? "..." : "Update"}
+                          </button>
+                        </div>
+
+                        {updateError[shipment.trackingNumber] && (
+                          <span className="shipment-update-error">
+                            {updateError[shipment.trackingNumber]}
+                          </span>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
-
-                <div className="shipment-route">
-                  <strong>{shipment.senderName || "Unknown sender"}</strong>
-
-                  <span>→</span>
-
-                  <strong>{shipment.receiverName || "Unknown receiver"}</strong>
-                </div>
-
-                <div className="shipment-package">
-                  <strong>{shipment.packageType || "Standard"}</strong>
-
-                  <span>{shipment.weight ?? 0} kg</span>
-                </div>
-
-                <div>
-                  <span
-                    className={`shipment-status status-${shipment.status?.toLowerCase()}`}
-                  >
-                    {getStatusIcon(shipment.status)}
-
-                    {formatStatus(shipment.status)}
-                  </span>
-                </div>
-
-                <div className="shipment-value">
-                  £
-                  {Number(shipment.estimatedCost || shipment.cost || 0).toFixed(
-                    2,
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

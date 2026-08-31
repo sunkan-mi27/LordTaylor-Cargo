@@ -97,6 +97,53 @@ export const getAdminCustomers = async (req, res) => {
   }
 };
 
+export const deleteCustomer = async (req, res) => {
+  try {
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required",
+      });
+    }
+
+    const { id } = req.params;
+
+    const customer = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+
+    if (customer.role !== "CUSTOMER") {
+      return res.status(400).json({
+        success: false,
+        message: "Only customer accounts can be deleted this way",
+      });
+    }
+
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Customer deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete customer error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete customer",
+    });
+  }
+};
+
 /* =========================================================
    ADMIN — BOOKINGS
 ========================================================= */

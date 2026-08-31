@@ -71,8 +71,6 @@ const BookShipment = () => {
 
   const [payment, setPayment] = useState({
     method: "Visa",
-    lastFour: "4242",
-    cardholder: "Sunkanmi Ibrahim",
   });
 
   /* =========================================
@@ -1103,34 +1101,52 @@ const BookShipment = () => {
                 {/* PAYMENT METHOD */}
 
                 <div className="payment-method-panel">
-                  <span className="payment-label">DEFAULT PAYMENT METHOD</span>
+                  <span className="payment-label">PAYMENT METHOD</span>
 
-                  <div className="payment-method-card active">
-                    <div className="payment-card-icon">💳</div>
+                  {["Visa", "Bank Transfer", "Pay on Delivery"].map(
+                    (method) => (
+                      <button
+                        type="button"
+                        key={method}
+                        className={`payment-method-card ${payment.method === method ? "active" : ""}`}
+                        onClick={() =>
+                          setPayment((prev) => ({ ...prev, method }))
+                        }
+                      >
+                        <div className="payment-card-icon">
+                          {method === "Visa"
+                            ? "💳"
+                            : method === "Bank Transfer"
+                              ? "🏦"
+                              : "📦"}
+                        </div>
 
-                    <div className="payment-card-info">
-                      <strong>
-                        {payment.method} •••• {payment.lastFour}
-                      </strong>
+                        <div className="payment-card-info">
+                          <strong>{method === "Visa" ? "Card" : method}</strong>
 
-                      <span>{payment.cardholder}</span>
+                          <span>
+                            {method === "Visa"
+                              ? "Pay securely via Flutterwave"
+                              : method === "Bank Transfer"
+                                ? "Pay via bank transfer on Flutterwave"
+                                : "Pay in cash when your shipment arrives"}
+                          </span>
+                        </div>
 
-                      <small>Default payment method</small>
-                    </div>
-
-                    <div className="payment-check">✓</div>
-                  </div>
-
-                  <button type="button" className="payment-change-button">
-                    Change payment method
-                  </button>
+                        {payment.method === method && (
+                          <div className="payment-check">✓</div>
+                        )}
+                      </button>
+                    ),
+                  )}
 
                   <div className="payment-secure-note">
                     <span>🔒</span>
 
                     <p>
-                      Your payment information is securely handled. No card
-                      details are stored in this demo.
+                      Card and bank details are entered directly on
+                      Flutterwave's secure checkout page — nothing is stored on
+                      our servers.
                     </p>
                   </div>
                 </div>

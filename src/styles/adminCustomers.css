@@ -70,7 +70,7 @@
 .admin-customers-table .admin-table-header,
 .admin-customers-table .admin-table-row {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 0.8fr 0.9fr 0.8fr;
+  grid-template-columns: 1.6fr 1fr 0.8fr 0.9fr 0.8fr 0.4fr;
   align-items: center;
   gap: 20px;
   padding: 17px 22px;
@@ -205,4 +205,121 @@
     gap: 8px;
     padding: 18px;
   }
+}
+
+.customer-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.customer-delete-button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e0e5ec;
+  border-radius: 9px;
+  background: #fff;
+  color: #a5adba;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.customer-delete-button:hover {
+  background: #fff0f0;
+  border-color: rgba(194, 60, 60, 0.3);
+  color: #c23c3c;
+}
+
+.customer-delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(16, 24, 40, 0.5);
+  padding: 20px;
+}
+
+.customer-delete-modal {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid #e0e5ec;
+  padding: 28px 26px 24px;
+  box-shadow: 0 30px 70px rgba(16, 24, 40, 0.25);
+  text-align: center;
+}
+
+.customer-delete-modal-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0f0;
+  color: #c23c3c;
+  font-size: 20px;
+}
+
+.customer-delete-modal h3 {
+  margin: 0 0 10px;
+  color: #172033;
+  font-size: 16px;
+}
+
+.customer-delete-modal p {
+  margin: 0 0 20px;
+  color: #667085;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.customer-delete-modal-error {
+  color: #c23c3c !important;
+  font-weight: 600;
+}
+
+.customer-delete-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.customer-delete-cancel,
+.customer-delete-confirm {
+  flex: 1;
+  border: none;
+  border-radius: 11px;
+  padding: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.customer-delete-cancel {
+  background: #f2f4f7;
+  color: #344054;
+}
+
+.customer-delete-cancel:hover {
+  background: #e7eaee;
+}
+
+.customer-delete-confirm {
+  background: #c23c3c;
+  color: #fff;
+}
+
+.customer-delete-confirm:hover {
+  filter: brightness(1.08);
+}
+
+.customer-delete-cancel:disabled,
+.customer-delete-confirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

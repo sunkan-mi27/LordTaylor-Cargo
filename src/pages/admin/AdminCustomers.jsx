@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { FaUsers, FaMagnifyingGlass, FaRotate, FaUser } from "react-icons/fa6";
+import {
+  FaUsers,
+  FaMagnifyingGlass,
+  FaRotate,
+  FaUser,
+  FaTrash,
+  FaTriangleExclamation,
+} from "react-icons/fa6";
 
 import "../../styles/adminCustomers.css";
 
@@ -11,6 +18,10 @@ const AdminCustomers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+
+  const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const getToken = () => {
     return (
@@ -50,6 +61,41 @@ const AdminCustomers = () => {
   useEffect(() => {
     loadCustomers();
   }, []);
+
+  const handleConfirmDelete = async () => {
+    if (!customerToDelete) return;
+
+    try {
+      setDeleting(true);
+      setDeleteError("");
+
+      const token = getToken();
+
+      const response = await fetch(
+        `${API_URL}/admin/customers/${customerToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to delete customer");
+      }
+
+      setCustomers((prev) => prev.filter((c) => c.id !== customerToDelete.id));
+      setCustomerToDelete(null);
+    } catch (err) {
+      console.error("Delete customer error:", err);
+      setDeleteError(err.message || "Failed to delete customer");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const filteredCustomers = customers.filter((customer) => {
     const query = search.toLowerCase().trim();
@@ -135,6 +181,7 @@ const AdminCustomers = () => {
               <span>BOOKINGS</span>
               <span>TOTAL SPENT</span>
               <span>JOINED</span>
+              <span></span>
             </div>
 
             {filteredCustomers.map((customer) => (
@@ -174,11 +221,76 @@ const AdminCustomers = () => {
                 <div className="customer-joined">
                   {new Date(customer.createdAt).toLocaleDateString()}
                 </div>
+
+                <div className="customer-actions">
+                  <button
+                    type="button"
+                    className="customer-delete-button"
+                    onClick={() => {
+                      setDeleteError("");
+                      setCustomerToDelete(customer);
+                    }}
+                    title="Delete customer"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {customerToDelete && (
+        <div
+          className="customer-delete-modal-overlay"
+          onClick={() => !deleting && setCustomerToDelete(null)}
+        >
+          <div
+            className="customer-delete-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="customer-delete-modal-icon">
+              <FaTriangleExclamation />
+            </div>
+
+            <h3>Delete this customer?</h3>
+
+            <p>
+              This will permanently remove{" "}
+              <strong>
+                {customerToDelete.firstName || customerToDelete.email}
+              </strong>{" "}
+              and all of their bookings, payments, shipments, and notifications.
+              This cannot be undone.
+            </p>
+
+            {deleteError && (
+              <p className="customer-delete-modal-error">{deleteError}</p>
+            )}
+
+            <div className="customer-delete-modal-actions">
+              <button
+                type="button"
+                className="customer-delete-cancel"
+                onClick={() => setCustomerToDelete(null)}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="customer-delete-confirm"
+                onClick={handleConfirmDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete Customer"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

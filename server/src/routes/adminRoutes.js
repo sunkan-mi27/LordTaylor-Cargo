@@ -9,6 +9,7 @@ import {
   getAdminShipment,
   updateAdminShipmentStatus,
   getAdminCustomers,
+  deleteCustomer,
   getAdminBookings,
   getAdminPayments,
 } from "../controllers/adminController.js";
@@ -35,6 +36,8 @@ router.patch("/shipments/:trackingNumber/status", updateAdminShipmentStatus);
 ========================= */
 
 router.get("/customers", getAdminCustomers);
+
+router.delete("/customers/:id", deleteCustomer);
 
 /* =========================
    BOOKINGS

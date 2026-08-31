@@ -527,14 +527,26 @@
   align-items: center;
   gap: 16px;
   min-height: 88px;
+  width: 100%;
   padding: 18px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   background: #151515;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: 0.2s ease;
+  margin-bottom: 12px;
+}
+
+.payment-method-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .payment-method-card.active {
-  border-color: rgba(255, 255, 255, 0.23);
+  border-color: #f2b134;
+  background: rgba(242, 177, 52, 0.08);
 }
 
 .payment-card-icon {
@@ -1002,5 +1014,19 @@
 
   .booking-tracking-box strong {
     font-size: 19px;
+  }
+}
+
+@media (max-width: 700px) {
+  .booking-steps {
+    gap: 22px;
+  }
+
+  .payment-card-info span {
+    font-size: 11px;
+  }
+
+  .payment-method-panel {
+    padding-bottom: 4px;
   }
 }
