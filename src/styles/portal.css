@@ -7,6 +7,11 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 .dashboard-layout {
   min-height: 100vh;
 
@@ -15,6 +20,10 @@
   background: #070b12;
 
   color: #ffffff;
+
+  overflow-x: hidden;
+
+  position: relative;
 }
 
 /* ===================================
@@ -888,15 +897,38 @@
     font-size: 14px;
   }
 
-  .dashboard-sidebar {
+    .dashboard-sidebar {
     z-index: 56;
+    width: 260px;
+    visibility: hidden;
     transform: translateX(-100%);
 
-    transition: 0.35s ease;
+    transition:
+      transform 0.3s ease,
+      visibility 0.3s ease;
   }
 
   .dashboard-sidebar.active {
+    visibility: visible;
     transform: translateX(0);
+  }
+
+  .sidebar-logo {
+    display: none;
+  }
+
+  .sidebar-nav {
+    padding-top: 60px;
+  }
+
+  .sidebar-footer {
+    padding: 16px;
+  }
+
+  .logout-btn {
+    width: 100%;
+    justify-content: center;
+    white-space: nowrap;
   }
 
   .dashboard-main {

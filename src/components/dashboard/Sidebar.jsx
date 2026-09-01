@@ -11,8 +11,18 @@ import {
   FaArrowRightFromBracket,
 } from "react-icons/fa6";
 
-const Sidebar = () => {
+const Sidebar = ({ onNavigate }) => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("lordtaylor-token");
+    localStorage.removeItem("lordtaylor-user");
+
+    sessionStorage.removeItem("lordtaylor-token");
+    sessionStorage.removeItem("lordtaylor-user");
+
+    navigate("/login", { replace: true });
+  };
 
   const menu = [
     {
@@ -51,18 +61,6 @@ const Sidebar = () => {
       path: "/settings",
     },
   ];
-
-  const handleLogout = () => {
-    // Remove authentication data
-    localStorage.removeItem("lordtaylor-token");
-    localStorage.removeItem("lordtaylor-user");
-
-    sessionStorage.removeItem("lordtaylor-token");
-    sessionStorage.removeItem("lordtaylor-user");
-
-    // Send customer back to login
-    navigate("/login", { replace: true });
-  };
 
   return (
     <aside className="sidebar">

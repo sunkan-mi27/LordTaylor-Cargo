@@ -27,6 +27,7 @@ import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminRegister from "./pages/admin/AdminRegister";
 
 function App() {
   return (
@@ -40,6 +41,8 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/register" element={<Register />} />
+
+      <Route path="/lt-admin-portal-9247" element={<AdminRegister />} />
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
