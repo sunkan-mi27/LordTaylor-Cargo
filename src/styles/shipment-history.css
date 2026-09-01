@@ -1474,3 +1474,20 @@
     gap: 5px;
   }
 }
+
+@media (max-width: 700px) {
+  .shipment-middle {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .shipment-route {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .shipment-route .route-line {
+    width: 2px;
+    height: 100%;
+  }
+}

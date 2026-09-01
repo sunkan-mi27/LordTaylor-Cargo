@@ -91,6 +91,8 @@ export const initiatePayment = async (req, res) => {
         amount: booking.payment.amount,
         currency: PAYMENT_CURRENCY,
         redirect_url: `${process.env.FRONTEND_URL}/payment/callback`,
+        payment_options:
+          booking.payment.method === "BANK_TRANSFER" ? "banktransfer" : "card",
         customer: {
           email: booking.senderEmail || booking.user.email,
           name: booking.senderName,

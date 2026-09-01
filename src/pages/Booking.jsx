@@ -472,6 +472,13 @@ const BookShipment = () => {
 
         {/* STEP INDICATOR */}
 
+        <p className="mobile-step-label">
+          Step {currentStep} of 5 - {currentStep === 1 && "Sender"}
+          {currentStep === 2 && "Receiver"}
+          {currentStep === 3 && "Paecel"}
+          {currentStep === 4 && "Review"}
+          {currentStep === 5 && "Payment"}
+        </p>
         <div className="booking-steps">
           {[1, 2, 3, 4, 5].map((step) => (
             <div key={step} className="step">
