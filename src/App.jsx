@@ -42,7 +42,7 @@ function App() {
 
       <Route path="/register" element={<Register />} />
 
-      <Route path="/lt-admin-portal-9247" element={<AdminRegister />} />
+      <Route path="/admin" element={<AdminRegister />} />
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
