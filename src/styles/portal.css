@@ -897,7 +897,7 @@ body {
     font-size: 14px;
   }
 
-    .dashboard-sidebar {
+  .dashboard-sidebar {
     z-index: 56;
     width: 260px;
     visibility: hidden;
@@ -911,6 +911,10 @@ body {
   .dashboard-sidebar.active {
     visibility: visible;
     transform: translateX(0);
+  }
+
+  .dashboard-content {
+    padding-top: 68px;
   }
 
   .sidebar-logo {
