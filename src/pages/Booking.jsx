@@ -590,7 +590,6 @@ const BookShipment = () => {
                   >
                     <option>United Kingdom</option>
                     <option>Nigeria</option>
-                    <option>United States</option>
                   </select>
                 </div>
 
@@ -723,7 +722,6 @@ const BookShipment = () => {
                   >
                     <option>Nigeria</option>
                     <option>United Kingdom</option>
-                    <option>United States</option>
                   </select>
                 </div>
 
