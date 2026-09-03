@@ -12,14 +12,6 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="dashboard-layout">
-      <button
-        type="button"
-        className="mobile-menu-toggle"
-        onClick={() => setSidebarOpen(true)}
-      >
-        <FaShip />
-      </button>
-
       {sidebarOpen && (
         <div
           className="mobile-sidebar-overlay"
@@ -40,6 +32,18 @@ const DashboardLayout = ({ children }) => {
       </aside>
 
       <div className="dashboard-main">
+        <div className="mobile-topbar">
+          <button
+            type="button"
+            className="mobile-menu-toggle"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <FaShip />
+          </button>
+
+          <span className="mobile-topbar-brand">LordTaylor</span>
+        </div>
+
         {isDashboard && <Topbar />}
 
         <main className="dashboard-content">{children}</main>

@@ -374,6 +374,13 @@
   flex-direction: column;
 
   gap: 6px;
+
+  min-width: 0;
+}
+
+.route-point strong {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .route-line {
