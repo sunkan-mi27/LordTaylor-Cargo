@@ -1058,3 +1058,187 @@
     padding-bottom: 4px;
   }
 }
+
+/* =========================================================
+   MOBILE OVERFLOW FIX
+   Prevent booking form from extending outside viewport
+========================================================= */
+
+@media (max-width: 700px) {
+  .dashboard-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .booking-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 26px 16px 50px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .booking-form {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .booking-form > * {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .booking-form > .booking-card-header,
+  .booking-form > .form-grid,
+  .booking-form > .package-selector,
+  .booking-form > .booking-review,
+  .booking-form > .payment-layout {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .form-grid {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-group {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+  }
+
+  .package-selector {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .package-option {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .booking-navigation {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .booking-back-button,
+  .booking-next-button {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .booking-next-button {
+    white-space: normal;
+  }
+
+  .payment-layout {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .payment-method-panel,
+  .payment-summary-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .payment-method-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .payment-card-info {
+    min-width: 0;
+  }
+
+  .payment-card-info strong,
+  .payment-card-info span,
+  .payment-card-info small {
+    overflow-wrap: anywhere;
+  }
+
+  .booking-review {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .review-details,
+  .review-section {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .review-total-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 460px) {
+  .booking-page {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .booking-navigation {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .booking-back-button,
+  .booking-next-button {
+    width: 100%;
+    min-width: 0;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .booking-next-button {
+    white-space: normal;
+    line-height: 1.3;
+  }
+}
